@@ -37,15 +37,40 @@
     --ink-2: #6B7280;
     --bg: #FFFAF7;
     --card: #FFFFFF;
+    --surface-2: #F6F9F8;
+    --danger-bg: #FEE2E2;
+    --danger-fg: #DC2626;
+    --glass: rgba(255, 255, 255, .72);
+    --glass-border: rgba(255, 255, 255, .55);
+    --bg-grad: linear-gradient(170deg, #FFF1ED 0%, #FFFAF7 40%, #FFFBF2 100%);
     --radius: 20px;
     --shadow: 0 6px 20px rgba(255, 107, 107, .08), 0 2px 6px rgba(31, 41, 55, .04);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  /* 暗黑模式：跟随系统自动切换，夜晚记账不刺眼 */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --primary-light: #46252a;
+      --income-light: #13342d;
+      --gray-light: #2a3038;
+      --ink: #E5E7EB;
+      --ink-2: #9CA3AF;
+      --gray: #6B7280;
+      --card: #1C222A;
+      --surface-2: #262D36;
+      --danger-bg: #3a2020;
+      --danger-fg: #F87171;
+      --glass: rgba(28, 34, 42, .72);
+      --glass-border: rgba(255, 255, 255, .08);
+      --bg-grad: linear-gradient(170deg, #232a33 0%, #161b22 40%, #1e242c 100%);
+      --shadow: 0 6px 20px rgba(0, 0, 0, .4), 0 2px 6px rgba(0, 0, 0, .2);
+    }
   }
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(170deg, #FFF1ED 0%, #FFFAF7 40%, #FFFBF2 100%);
+    background: var(--bg-grad);
     background-attachment: fixed;
     color: var(--ink);
     min-height: 100dvh;
@@ -83,7 +108,9 @@
   /* ===== Month switcher ===== */
   .month-switcher {
     display: flex; align-items: center; justify-content: space-between;
-    background: var(--card); border-radius: 16px; padding: 10px 16px;
+    background: var(--glass); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px; padding: 10px 16px;
     box-shadow: var(--shadow); margin-bottom: 14px;
   }
   .month-switcher button {
@@ -107,10 +134,12 @@
     margin-bottom: 14px;
   }
   .stat-card {
-    background: var(--card); border-radius: 16px; padding: 12px 6px;
+    background: var(--glass); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px; padding: 12px 6px;
     text-align: center; box-shadow: var(--shadow);
   }
-  .stat-card .num { font-size: 18px; font-weight: 800; line-height: 1.1; }
+  .stat-card .num { font-size: 18px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
   .stat-card .lbl { font-size: 11px; color: var(--ink-2); margin-top: 3px; }
   .stat-card .num.income { color: var(--income-dark); }
   .stat-card .num.expense { color: var(--primary); }
@@ -243,7 +272,7 @@
   }
   .modal-mask.show { display: flex; opacity: 1; }
   .modal {
-    background: #fff; width: 100%; max-width: 480px;
+    background: var(--card); width: 100%; max-width: 480px;
     border-radius: 24px 24px 0 0; padding: 20px 20px calc(24px + var(--safe-bottom));
     max-height: 90dvh; overflow-y: auto;
     transform: translateY(40px); transition: transform .25s ease;
@@ -259,10 +288,10 @@
   .field input, .field select, .field textarea {
     width: 100%; border: 2px solid var(--gray-light); border-radius: 14px;
     padding: 11px 14px; font-size: 15px; font-family: inherit; color: var(--ink);
-    background: #FAFCFB; outline: none; transition: border-color .15s;
+    background: var(--surface-2); outline: none; transition: border-color .15s;
     -webkit-appearance: none; appearance: none;
   }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--primary); background: #fff; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--primary); background: var(--card); }
   .field textarea { resize: vertical; min-height: 64px; }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .select-wrap { position: relative; }
@@ -279,7 +308,7 @@
   .modal .submit:active { transform: scale(.98); }
   .modal .delete-btn {
     width: 100%; padding: 12px; border-radius: 16px; margin-top: 10px;
-    background: #FEF2F2; color: #DC2626; border: none; font-size: 14px; font-weight: 700; cursor: pointer;
+    background: var(--danger-bg); color: var(--danger-fg); border: none; font-size: 14px; font-weight: 700; cursor: pointer;
   }
 
   /* ===== Toast ===== */
@@ -295,7 +324,7 @@
   .confirm-mask { position: fixed; inset: 0; background: rgba(31, 41, 55, .5); z-index: 150; display: none; align-items: center; justify-content: center; }
   .confirm-mask.show { display: flex; }
   .confirm-box {
-    background: #fff; border-radius: 20px; padding: 22px; width: 82%; max-width: 320px;
+    background: var(--card); border-radius: 20px; padding: 22px; width: 82%; max-width: 320px;
     text-align: center; animation: pop .2s;
   }
   @keyframes pop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -303,7 +332,7 @@
   .confirm-box p { font-size: 13px; color: var(--ink-2); margin-bottom: 18px; line-height: 1.6; }
   .confirm-box .btns { display: flex; gap: 10px; }
   .confirm-box .btns button { flex: 1; padding: 11px; border-radius: 14px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; }
-  .confirm-box .btns .ok { background: #DC2626; color: #fff; }
+  .confirm-box .btns .ok { background: var(--danger-fg); color: #fff; }
   .confirm-box .btns .cancel { background: var(--gray-light); color: var(--ink-2); }
 
   /* export menu */
@@ -312,7 +341,7 @@
   .export-menu .mask { position: absolute; inset: 0; background: rgba(31, 41, 55, .35); }
   .export-menu .sheet {
     position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 480px; background: #fff;
+    width: 100%; max-width: 480px; background: var(--card);
     border-radius: 24px 24px 0 0; padding: 20px 20px calc(20px + var(--safe-bottom));
     animation: slideup .25s;
   }
@@ -320,7 +349,7 @@
   .export-menu .sheet h3 { font-size: 17px; font-weight: 800; text-align: center; margin-bottom: 14px; }
   .export-menu .opt {
     display: flex; align-items: center; gap: 12px; width: 100%;
-    padding: 13px 14px; border-radius: 14px; border: none; background: #F6F9F8;
+    padding: 13px 14px; border-radius: 14px; border: none; background: var(--surface-2);
     font-size: 15px; font-weight: 600; color: var(--ink); cursor: pointer; margin-bottom: 8px;
     text-align: left; font-family: inherit;
   }
@@ -369,7 +398,7 @@
     font-weight: 600; cursor: pointer; transition: all .15s; font-family: inherit;
   }
   .ch-title .toggle button.active {
-    background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08);
   }
   .ch-title .legend-mini {
     display: flex; gap: 10px; font-size: 11px; color: var(--ink-2); font-weight: 600;
@@ -425,6 +454,94 @@
   }
   .install-hint.show { display: block; }
   .install-hint b { color: var(--primary-dark); }
+
+  /* ===== 搜索栏 ===== */
+  .search-bar {
+    display: flex; gap: 8px; align-items: center;
+    background: var(--card); border-radius: 16px; padding: 8px 12px;
+    box-shadow: var(--shadow); margin-bottom: 12px;
+  }
+  .search-bar svg { width: 18px; height: 18px; color: var(--gray); flex-shrink: 0; }
+  .search-bar input[type=text] {
+    flex: 1; border: none; background: transparent; outline: none;
+    font-size: 14px; color: var(--ink); font-family: inherit; min-width: 0;
+  }
+  .search-bar .clear {
+    border: none; background: var(--gray-light); color: var(--ink-2);
+    width: 22px; height: 22px; border-radius: 50%; cursor: pointer;
+    font-size: 12px; display: none; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .search-bar .clear.show { display: flex; }
+  .range-row {
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: center;
+    margin-bottom: 12px; display: none;
+  }
+  .range-row.show { display: grid; }
+  .range-row input[type=date] {
+    border: none; background: var(--card); border-radius: 12px; padding: 8px 10px;
+    font-size: 12px; color: var(--ink); font-family: inherit; box-shadow: var(--shadow);
+    outline: none; -webkit-appearance: none; appearance: none; color-scheme: light dark;
+  }
+  .range-row span { font-size: 11px; color: var(--gray); }
+
+  /* ===== 数字键盘 ===== */
+  .keypad {
+    display: none; margin-top: 12px; border-radius: 18px;
+    background: var(--surface-2); padding: 10px;
+  }
+  .keypad.show { display: block; animation: kpup .18s ease; }
+  @keyframes kpup { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .keypad .kp-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  }
+  .keypad .kp-grid .kp-row2 {
+    grid-column: 1 / -1; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px;
+  }
+  .kp-btn {
+    border: none; cursor: pointer; border-radius: 14px;
+    background: var(--card); color: var(--ink);
+    font-size: 22px; font-weight: 700; font-family: inherit;
+    height: 54px; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,.06);
+    transition: transform .1s; -webkit-user-select: none; user-select: none;
+  }
+  .kp-btn:active { transform: scale(.92); background: var(--gray-light); }
+  .kp-btn.del { font-size: 18px; color: var(--ink-2); }
+  .kp-btn.dot { font-weight: 800; }
+  .kp-btn.confirm {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff; font-size: 17px; box-shadow: 0 4px 12px rgba(255, 107, 107, .35);
+  }
+  .kp-btn.empty { background: transparent; box-shadow: none; cursor: default; }
+
+  /* ===== 设置面板（GitHub 同步） ===== */
+  .set-field { margin-bottom: 12px; }
+  .set-field label { display: block; font-size: 12px; font-weight: 700; color: var(--ink-2); margin-bottom: 5px; }
+  .set-field input {
+    width: 100%; border: 2px solid var(--gray-light); border-radius: 12px;
+    padding: 10px 12px; font-size: 14px; color: var(--ink); background: var(--surface-2);
+    outline: none; font-family: inherit;
+  }
+  .set-field input:focus { border-color: var(--primary); background: var(--card); }
+  .set-field .hint { font-size: 11px; color: var(--gray); margin-top: 4px; line-height: 1.5; }
+  .sync-btns { display: flex; gap: 10px; margin-top: 4px; }
+  .sync-btns button {
+    flex: 1; border: none; cursor: pointer; padding: 12px; border-radius: 14px;
+    font-size: 14px; font-weight: 700; font-family: inherit;
+    background: var(--surface-2); color: var(--ink); transition: all .15s;
+  }
+  .sync-btns button:active { transform: scale(.96); }
+  .sync-btns button.primary { background: linear-gradient(135deg, var(--blue), #3B5BDB); color: #fff; }
+  .sync-status { font-size: 12px; color: var(--ink-2); margin-top: 10px; line-height: 1.6; min-height: 16px; }
+
+  /* ===== Toast 成功动效 ===== */
+  .toast.ok { background: var(--income-dark); }
+  .toast.ok::before { content: '✓ '; font-weight: 800; }
+
+  /* ===== 金额数字等宽对齐 ===== */
+  .card .amount, .donut-legend .lg-amt, .summary-item .amt, .trend-tip b, .card .meta .date, .day-group .right {
+    font-variant-numeric: tabular-nums;
+  }
 </style>
 </head>
 <body>
@@ -468,6 +585,17 @@
   <div id="chartBox"></div>
   <div id="summaryBox"></div>
 
+  <div class="search-bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" id="searchInput" placeholder="搜索备注、分类、金额…" autocomplete="off">
+    <button class="clear" id="searchClear" aria-label="清除">✕</button>
+  </div>
+  <div class="range-row" id="rangeRow">
+    <input type="date" id="dateFrom" aria-label="开始日期">
+    <span>至</span>
+    <input type="date" id="dateTo" aria-label="结束日期">
+  </div>
+
   <div class="chips" id="chips"></div>
 
   <div class="section-title">
@@ -503,7 +631,29 @@
 
     <div class="field">
       <label>金额 <span class="req">*</span></label>
-      <input type="number" inputmode="decimal" step="0.01" id="fAmount" placeholder="0.00">
+      <input type="text" inputmode="none" id="fAmount" placeholder="0.00" readonly style="font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;font-variant-numeric:tabular-nums;cursor:pointer">
+    </div>
+
+    <div class="keypad" id="keypad">
+      <div class="kp-grid">
+        <button class="kp-btn" data-k="1">1</button>
+        <button class="kp-btn" data-k="2">2</button>
+        <button class="kp-btn" data-k="3">3</button>
+        <button class="kp-btn" data-k="4">4</button>
+        <button class="kp-btn" data-k="5">5</button>
+        <button class="kp-btn" data-k="6">6</button>
+        <button class="kp-btn" data-k="7">7</button>
+        <button class="kp-btn" data-k="8">8</button>
+        <button class="kp-btn" data-k="9">9</button>
+        <div class="kp-row2">
+          <button class="kp-btn dot" data-k=".">.</button>
+          <button class="kp-btn" data-k="0">0</button>
+          <button class="kp-btn del" id="kpDel" aria-label="删除">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z"/><path d="M18 9l-6 6M12 9l6 6"/></svg>
+          </button>
+        </div>
+        <button class="kp-btn confirm" id="kpConfirm" style="grid-column:1/-1">保存</button>
+      </div>
     </div>
 
     <div class="field">
@@ -548,6 +698,38 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
       <span>清空全部数据<small>仅删除本机数据，操作前请先备份</small></span>
     </button>
+    <button class="opt" id="optGithub" style="margin-top:12px;background:var(--ink);color:#fff">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.15c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.26.72-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.73.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.25 5.66.41.36.78 1.06.78 2.14v3.17c0 .3.2.67.8.55A11.52 11.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg>
+      <span>GitHub 云同步<small>把账本数据备份到你的 GitHub 仓库，换手机也能恢复</small></span>
+    </button>
+  </div>
+</div>
+
+<!-- GitHub 同步设置 -->
+<div class="modal-mask" id="githubMask">
+  <div class="modal">
+    <div class="grab"></div>
+    <h3>GitHub 云同步 <button class="close" id="githubClose">✕</button></h3>
+    <div class="set-field">
+      <label>Personal Access Token</label>
+      <input type="password" id="ghToken" placeholder="ghp_xxx" autocomplete="off">
+      <div class="hint">在 GitHub → Settings → Developer settings → Personal access tokens 创建，勾选 repo 权限。Token 仅保存在本机。</div>
+    </div>
+    <div class="set-field">
+      <label>仓库</label>
+      <input type="text" id="ghRepo" placeholder="Iexplain/Tools">
+      <div class="hint">格式：用户名/仓库名</div>
+    </div>
+    <div class="set-field">
+      <label>备份文件路径</label>
+      <input type="text" id="ghPath" placeholder="jizhangji/data/account.json">
+      <div class="hint">账本数据会存到这个路径。建议每个应用用不同文件名，避免覆盖。</div>
+    </div>
+    <div class="sync-btns">
+      <button id="ghUpload" class="primary">上传到 GitHub</button>
+      <button id="ghDownload">从 GitHub 拉取</button>
+    </div>
+    <div class="sync-status" id="ghStatus"></div>
   </div>
 </div>
 
@@ -600,6 +782,11 @@ let filter = 'all';        // all / expense / income / 分类 id
 let chartTab = 'expense';  // 环形图 tab: expense / income
 let editType = 'expense';  // 编辑器中的当前类型
 let editCat = '';          // 编辑器中的当前分类
+let searchQ = '';          // 搜索关键字
+let dateFrom = '';         // 日期范围起
+let dateTo = '';           // 日期范围止
+const MEM_KEY = 'accountBook.lastCat.v1';  // 记住上次选择的类型+分类
+const GH_KEY = 'accountBook.gh.v1';        // GitHub 同步配置
 
 /* ================= 工具 ================= */
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
@@ -931,10 +1118,31 @@ function renderChips() {
 
 /* ================= 列表 ================= */
 function filtered() {
-  const list = monthRecords();
-  if (filter === 'all') return list;
-  if (filter === 'expense' || filter === 'income') return list.filter(r => r.type === filter);
-  return list.filter(r => r.category === filter);
+  let list = monthRecords();
+  // 日期范围
+  if (dateFrom || dateTo) {
+    list = list.filter(r => {
+      const d = r.date || '';
+      if (dateFrom && d < dateFrom) return false;
+      if (dateTo && d > dateTo) return false;
+      return true;
+    });
+  }
+  // 类型/分类 chips
+  if (filter === 'expense' || filter === 'income') list = list.filter(r => r.type === filter);
+  else if (filter !== 'all') list = list.filter(r => r.category === filter);
+  // 关键字：匹配备注 / 分类名 / 金额文本
+  if (searchQ) {
+    const q = searchQ.toLowerCase();
+    list = list.filter(r => {
+      const cat = getCat(r.type, r.category);
+      const amtTxt = String(r.amount);
+      return (r.note || '').toLowerCase().includes(q)
+        || cat.label.includes(searchQ)
+        || amtTxt.includes(q);
+    });
+  }
+  return list;
 }
 function renderList() {
   const list = filtered();
@@ -1052,8 +1260,11 @@ function openEditor(id) {
     document.getElementById('editorTitle').firstChild.textContent = '编辑这笔账 ';
     document.getElementById('btnDelete').style.display = 'block';
   } else {
-    editType = 'expense';
-    editCat = Object.keys(CATS.expense)[0];
+    // 新记账：自动记住上次选择的类型+分类，少点几下
+    let mem = null;
+    try { mem = JSON.parse(localStorage.getItem(MEM_KEY)); } catch (e) {}
+    editType = (mem && CATS[mem.type]) ? mem.type : 'expense';
+    editCat = (mem && CATS[mem.type] && CATS[mem.type][mem.cat]) ? mem.cat : Object.keys(CATS[editType])[0];
     document.getElementById('fAmount').value = '';
     document.getElementById('fNote').value = '';
     document.getElementById('fDate').value = todayStr();
@@ -1062,10 +1273,34 @@ function openEditor(id) {
     document.getElementById('btnDelete').style.display = 'none';
   }
   setEditType(editType);
+  hideKeypad();
   document.getElementById('editorMask').classList.add('show');
-  setTimeout(() => document.getElementById('fAmount').focus(), 250);
+  // 优先展开自定义键盘而不是系统键盘
+  showKeypad();
 }
-function closeEditor() { document.getElementById('editorMask').classList.remove('show'); editingId = null; }
+function closeEditor() { document.getElementById('editorMask').classList.remove('show'); editingId = null; hideKeypad(); }
+
+/* ================= 自定义数字键盘 ================= */
+function showKeypad() { document.getElementById('keypad').classList.add('show'); }
+function hideKeypad() { document.getElementById('keypad').classList.remove('show'); }
+function kpInput(k) {
+  const el = document.getElementById('fAmount');
+  let v = el.value;
+  if (k === '.') {
+    if (!v.includes('.')) { el.value = v ? v + '.' : '0.'; }
+  } else {
+    // 最多两位小数
+    const parts = v.split('.');
+    if (parts[1] && parts[1].length >= 2) return;
+    // 前导 0 处理
+    if (v === '0' || v === '') el.value = k;
+    else el.value = v + k;
+  }
+}
+function kpDel() {
+  const el = document.getElementById('fAmount');
+  el.value = el.value.slice(0, -1);
+}
 
 function saveEditor() {
   const amt = parseFloat(document.getElementById('fAmount').value);
@@ -1081,10 +1316,12 @@ function saveEditor() {
   if (editingId) {
     const r = records.find(x => x.id === editingId);
     Object.assign(r, data, { updatedAt: Date.now() });
-    toast('已保存修改');
+    toast('已保存修改', true);
   } else {
     records.unshift(Object.assign({ id: uid(), createdAt: Date.now(), updatedAt: Date.now() }, data));
-    toast('已记一笔：' + fmtMoney(data.amount));
+    toast('已记一笔：' + fmtMoney(data.amount), true);
+    // 记住这次的类型+分类，下次打开直接选中
+    try { localStorage.setItem(MEM_KEY, JSON.stringify({ type: editType, cat: editCat })); } catch (e) {}
   }
   save(); closeEditor();
   // 新增/编辑后，如果当前查看的不是该账所在月份，自动跳到
@@ -1174,9 +1411,10 @@ function importJSON(file) {
 
 /* ================= Toast / Confirm ================= */
 let toastTimer = null;
-function toast(msg) {
+function toast(msg, ok) {
   const el = document.getElementById('toast');
   el.textContent = msg;
+  el.classList.toggle('ok', !!ok);
   el.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
@@ -1189,6 +1427,84 @@ function confirmBox(title, text, ok) {
   document.getElementById('confirmMask').classList.add('show');
 }
 function closeConfirm() { document.getElementById('confirmMask').classList.remove('show'); cfCallback = null; }
+
+/* ================= GitHub 云同步 ================= */
+function ghLoad() {
+  try { return JSON.parse(localStorage.getItem(GH_KEY)) || {}; } catch (e) { return {}; }
+}
+function ghSave(cfg) { localStorage.setItem(GH_KEY, JSON.stringify(cfg)); }
+function ghStatus(msg, isErr) {
+  const el = document.getElementById('ghStatus');
+  el.textContent = msg;
+  el.style.color = isErr ? 'var(--danger-fg)' : 'var(--ink-2)';
+}
+function ghApi(path, token, method, body) {
+  return fetch('https://api.github.com' + path, {
+    method: method || 'GET',
+    headers: Object.assign(
+      { 'Accept': 'application/vnd.github.v3+json' },
+      token ? { 'Authorization': 'Bearer ' + token } : {},
+      body ? { 'Content-Type': 'application/json' } : {}
+    ),
+    body: body ? JSON.stringify(body) : undefined
+  }).then(res => res.json().catch(() => ({})).then(j => ({ ok: res.ok, status: res.status, j })));
+}
+function ghUpload() {
+  const cfg = readGhForm();
+  if (!cfg.token || !cfg.repo || !cfg.path) { ghStatus('请先填写 Token、仓库和文件路径', true); return; }
+  ghSave(cfg);
+  ghStatus('正在上传…');
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify({ app: '记账本', version: 1, exportedAt: new Date().toISOString(), records }, null, 2))));
+  const url = '/repos/' + cfg.repo + '/contents/' + cfg.path;
+  ghApi(url, cfg.token).then(r => {
+    const body = { message: '记账本云同步 ' + new Date().toLocaleString('zh-CN'), content, branch: 'main' };
+    if (r.ok && r.j && r.j.sha) body.sha = r.j.sha;
+    return ghApi(url, cfg.token, 'PUT', body);
+  }).then(r => {
+    if (r.ok) ghStatus('✅ 上传成功：' + new Date().toLocaleTimeString('zh-CN'));
+    else ghStatus('上传失败：' + (r.j && r.j.message || '未知错误，请检查 Token 与仓库名'), true);
+  }).catch(e => ghStatus('网络错误：' + e.message, true));
+}
+function ghDownload() {
+  const cfg = readGhForm();
+  if (!cfg.token || !cfg.repo || !cfg.path) { ghStatus('请先填写 Token、仓库和文件路径', true); return; }
+  ghSave(cfg);
+  ghStatus('正在拉取…');
+  ghApi('/repos/' + cfg.repo + '/contents/' + cfg.path, cfg.token).then(r => {
+    if (!r.ok) { ghStatus('拉取失败：' + (r.j && r.j.message || '文件不存在？'), true); return; }
+    let text;
+    try {
+      text = decodeURIComponent(escape(atob(r.j.content.replace(/\s/g, ''))));
+    } catch (e) { text = atob(r.j.content.replace(/\s/g, '')); }
+    const data = JSON.parse(text);
+    const arr = Array.isArray(data) ? data : (data.records || []);
+    if (!arr.length) { ghStatus('云端数据为空'); return; }
+    confirmBox('拉取 ' + arr.length + ' 笔云端记录？', '将与当前数据合并（按 ID 去重），本地数据保留。', () => {
+      const ids = new Set(records.map(x => x.id));
+      let added = 0;
+      arr.forEach(x => {
+        if (x && x.amount != null && (x.type === 'income' || x.type === 'expense') && x.category && !ids.has(x.id)) {
+          records.push(x); ids.add(x.id); added++;
+        }
+      });
+      save(); renderAll();
+      ghStatus('✅ 已拉取 ' + added + ' 笔，当前共 ' + records.length + ' 笔');
+    });
+  }).catch(e => ghStatus('网络错误：' + e.message, true));
+}
+function readGhForm() {
+  return {
+    token: document.getElementById('ghToken').value.trim(),
+    repo: document.getElementById('ghRepo').value.trim() || 'Iexplain/Tools',
+    path: document.getElementById('ghPath').value.trim() || 'jizhangji/data/account.json'
+  };
+}
+function ghFill() {
+  const c = ghLoad();
+  if (c.repo) document.getElementById('ghRepo').value = c.repo;
+  if (c.path) document.getElementById('ghPath').value = c.path;
+  if (c.token) document.getElementById('ghToken').value = c.token;
+}
 
 /* ================= 事件绑定 ================= */
 document.getElementById('btnAdd').onclick = () => openEditor(null);
@@ -1212,6 +1528,35 @@ document.getElementById('optClear').onclick = () => {
 };
 document.getElementById('cfOk').onclick = () => { const cb = cfCallback; closeConfirm(); if (cb) cb(); };
 document.getElementById('cfCancel').onclick = closeConfirm;
+
+/* 搜索 */
+const si = document.getElementById('searchInput');
+const sc = document.getElementById('searchClear');
+si.addEventListener('input', () => { searchQ = si.value.trim(); sc.classList.toggle('show', !!searchQ); renderList(); });
+sc.addEventListener('click', () => { si.value = ''; searchQ = ''; sc.classList.remove('show'); renderList(); });
+document.getElementById('dateFrom').addEventListener('change', e => { dateFrom = e.target.value; renderList(); });
+document.getElementById('dateTo').addEventListener('change', e => { dateTo = e.target.value; renderList(); });
+
+/* 自定义数字键盘 */
+document.getElementById('fAmount').onclick = (e) => {
+  e.target.blur();
+  const kp = document.getElementById('keypad');
+  kp.classList.contains('show') ? hideKeypad() : showKeypad();
+};
+document.querySelectorAll('.kp-btn[data-k]').forEach(b => b.onclick = () => kpInput(b.dataset.k));
+document.getElementById('kpDel').onclick = kpDel;
+document.getElementById('kpConfirm').onclick = () => { hideKeypad(); saveEditor(); };
+
+/* GitHub 同步 */
+document.getElementById('optGithub').onclick = () => {
+  document.getElementById('exportMenu').classList.remove('show');
+  ghFill();
+  document.getElementById('githubMask').classList.add('show');
+};
+document.getElementById('githubClose').onclick = () => document.getElementById('githubMask').classList.remove('show');
+document.getElementById('githubMask').onclick = (e) => { if (e.target.id === 'githubMask') document.getElementById('githubMask').classList.remove('show'); };
+document.getElementById('ghUpload').onclick = ghUpload;
+document.getElementById('ghDownload').onclick = ghDownload;
 
 // 月份切换
 document.getElementById('prevMonth').onclick = () => { viewMonth = shiftMonth(viewMonth, -1); renderAll(); };
