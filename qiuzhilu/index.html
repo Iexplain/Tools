@@ -334,6 +334,155 @@
   }
   .install-hint.show { display: block; }
   .install-hint b { color: var(--primary-dark); }
+
+  /* ===== 视图切换 ===== */
+  .view-switch {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+    background: var(--card); border-radius: 16px; padding: 4px;
+    box-shadow: var(--shadow); margin-bottom: 14px;
+  }
+  .view-switch button {
+    border: none; background: transparent; cursor: pointer; padding: 9px 4px;
+    border-radius: 12px; font-size: 13px; font-weight: 700; color: var(--ink-2);
+    font-family: inherit; transition: all .15s;
+  }
+  .view-switch button.active { background: var(--primary); color: #fff; box-shadow: 0 3px 8px rgba(0, 200, 150, .3); }
+
+  /* ===== 看板 ===== */
+  .kanban { display: flex; flex-direction: column; gap: 12px; }
+  .kanban-col {
+    background: var(--card); border-radius: var(--radius); padding: 12px;
+    box-shadow: var(--shadow);
+  }
+  .kanban-col .col-head {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  }
+  .kanban-col .col-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .kanban-col .col-title { font-size: 14px; font-weight: 800; }
+  .kanban-col .col-count {
+    font-size: 11px; color: var(--ink-2); background: var(--gray-light);
+    padding: 2px 8px; border-radius: 10px; margin-left: auto;
+  }
+  .kanban-card {
+    background: #fff; border: 1px solid var(--gray-light); border-radius: 14px;
+    padding: 10px 12px; margin-bottom: 8px; cursor: pointer; transition: transform .12s;
+    box-shadow: 0 2px 6px rgba(0,0,0,.03);
+  }
+  .kanban-card:active { transform: scale(.97); }
+  .kanban-card .kc-company { font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .kanban-card .kc-company .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kanban-card .kc-pos { font-size: 12px; color: var(--ink-2); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kanban-card .kc-meta { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 11px; color: var(--ink-2); flex-wrap: wrap; }
+  .kanban-card .kc-next { color: #E8A000; font-weight: 700; }
+  .kanban-empty { text-align: center; color: var(--gray); font-size: 12px; padding: 14px 0 4px; }
+
+  /* ===== 漏斗统计 ===== */
+  .funnel-card {
+    background: var(--card); border-radius: var(--radius); padding: 14px 16px;
+    margin-bottom: 14px; box-shadow: var(--shadow);
+  }
+  .funnel-card h2 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+  .funnel-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .funnel-row .f-label { width: 64px; font-size: 12px; color: var(--ink-2); font-weight: 600; flex-shrink: 0; }
+  .funnel-row .f-bar-wrap { flex: 1; display: flex; align-items: center; gap: 8px; }
+  .funnel-row .f-bar {
+    height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 12px; font-weight: 800; min-width: 30px;
+    transition: width .4s ease;
+  }
+  .funnel-row .f-note { font-size: 11px; color: var(--gray); white-space: nowrap; }
+  .funnel-tip { font-size: 11px; color: var(--ink-2); line-height: 1.6; }
+
+  /* ===== 日历 ===== */
+  .cal-card {
+    background: var(--card); border-radius: var(--radius); padding: 14px 16px;
+    margin-bottom: 14px; box-shadow: var(--shadow);
+  }
+  .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .cal-head .cal-title { font-size: 15px; font-weight: 800; }
+  .cal-head .cal-nav { display: flex; gap: 6px; }
+  .cal-head .cal-nav button {
+    border: none; background: var(--gray-light); color: var(--ink-2);
+    width: 30px; height: 30px; border-radius: 9px; cursor: pointer; font-size: 15px;
+    display: flex; align-items: center; justify-content: center; font-family: inherit;
+  }
+  .cal-head .cal-nav button:active { background: var(--primary); color: #fff; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal-dow { text-align: center; font-size: 11px; color: var(--gray); font-weight: 600; padding: 4px 0; }
+  .cal-day {
+    position: relative; aspect-ratio: 1; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--ink-2); cursor: pointer; border: none;
+    background: transparent; font-family: inherit; padding: 0;
+  }
+  .cal-day:hover { background: var(--gray-light); }
+  .cal-day.empty { cursor: default; }
+  .cal-day.empty:hover { background: transparent; }
+  .cal-day.today { font-weight: 800; color: var(--primary-dark); box-shadow: inset 0 0 0 2px var(--primary); }
+  .cal-day.has-events { color: var(--ink); font-weight: 700; background: var(--orange-light); }
+  .cal-day .cal-dot { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--orange); }
+  .cal-day-list { margin-top: 10px; border-top: 1px dashed var(--gray-light); padding-top: 10px; }
+  .cal-day-list .item {
+    display: flex; align-items: center; gap: 8px; padding: 7px 4px; font-size: 13px;
+    border-radius: 10px; cursor: pointer;
+  }
+  .cal-day-list .item:active { background: var(--gray-light); }
+  .cal-day-list .item .t { color: var(--ink-2); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .cal-day-list .item .c { flex: 1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cal-day-list .item .st { font-size: 11px; font-weight: 700; color: #fff; padding: 2px 8px; border-radius: 8px; }
+  .cal-day-list .cal-ics {
+    width: 100%; margin-top: 8px; border: none; cursor: pointer;
+    background: var(--primary-light); color: var(--primary-dark);
+    font-size: 13px; font-weight: 700; padding: 10px; border-radius: 12px; font-family: inherit;
+  }
+
+  /* ===== Offer 对比 ===== */
+  .cmp-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .cmp-table { border-collapse: collapse; width: 100%; min-width: 420px; font-size: 13px; }
+  .cmp-table th, .cmp-table td {
+    padding: 10px 12px; border-bottom: 1px solid var(--gray-light); text-align: left;
+    vertical-align: top;
+  }
+  .cmp-table thead th { font-size: 12px; color: var(--ink-2); font-weight: 700; white-space: nowrap; }
+  .cmp-table td.co { font-weight: 800; color: var(--primary-dark); white-space: nowrap; }
+  .cmp-empty { text-align: center; color: var(--gray); padding: 30px 0; font-size: 13px; line-height: 1.7; }
+
+  /* ===== 状态快捷切换菜单 ===== */
+  .st-menu-mask { position: fixed; inset: 0; z-index: 140; display: none; }
+  .st-menu-mask.show { display: block; }
+  .st-menu-mask .mask { position: absolute; inset: 0; background: rgba(31, 41, 55, .35); }
+  .st-menu {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    bottom: 0; width: 100%; max-width: 480px; background: #fff;
+    border-radius: 24px 24px 0 0; padding: 18px 20px calc(18px + var(--safe-bottom));
+    animation: slideup .22s;
+  }
+  .st-menu h4 { font-size: 16px; font-weight: 800; text-align: center; margin-bottom: 14px; }
+  .st-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .st-opt {
+    border: none; cursor: pointer; padding: 10px 4px; border-radius: 12px;
+    font-size: 13px; font-weight: 700; font-family: inherit;
+    background: var(--gray-light); color: var(--ink-2); transition: all .15s;
+  }
+  .st-opt:active { transform: scale(.95); }
+  .st-opt.cur { color: #fff; }
+
+  /* ===== 语义化 Badge ===== */
+  .badge.sem { color: var(--ink); }
+  .badge.sem.offer { background: var(--primary-light); color: var(--primary-dark); }
+  .badge.sem.progress { background: var(--blue-light); color: var(--blue); }
+  .badge.sem.done { background: var(--gray-light); color: var(--ink-2); }
+  .badge.sem.warn { background: var(--orange-light); color: var(--orange); }
+
+  /* ===== 复盘摘要 ===== */
+  .review-pill {
+    display: inline-flex; align-items: center; gap: 4px; font-size: 12px;
+    color: var(--purple); background: var(--purple-light);
+    padding: 4px 10px; border-radius: 10px; margin-top: 8px;
+  }
+
+  /* ===== 空状态插画 ===== */
+  .empty-art { font-size: 56px; line-height: 1; margin-bottom: 12px; }
 </style>
 </head>
 <body>
@@ -362,11 +511,20 @@
     <div class="stat-card"><div class="num gray" id="stTotal">0</div><div class="lbl">累计投递</div></div>
   </div>
 
+  <div class="view-switch">
+    <button data-view="list" class="active">列表</button>
+    <button data-view="kanban">看板</button>
+    <button data-view="calendar">日历</button>
+    <button data-view="compare">Offer对比</button>
+  </div>
+
   <div class="reminder" id="reminder">
     <div class="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
     <div class="txt"><b id="remTitle">即将面试</b><span id="remSub"></span></div>
     <div class="countdown" id="remCount"></div>
   </div>
+
+  <div id="funnelBox"></div>
 
   <div class="chips" id="chips"></div>
 
@@ -434,8 +592,50 @@
       <label>备注</label>
       <textarea id="fNotes" placeholder="面试要点、联系人、复盘记录……"></textarea>
     </div>
+
+    <details class="field" id="reviewBox" open>
+      <summary style="cursor:pointer;font-size:13px;font-weight:700;color:var(--ink-2);margin-bottom:8px">📝 面试复盘（结构化）</summary>
+      <div class="field">
+        <label>被问到的核心问题</label>
+        <textarea id="fRevQ" placeholder="八股文 / 项目深挖点 / 场景题……每行一条"></textarea>
+      </div>
+      <div class="field">
+        <label>表现较好的地方</label>
+        <textarea id="fRevGood" placeholder="哪里答得不错，保持住"></textarea>
+      </div>
+      <div class="field">
+        <label>未答出 / 待改进</label>
+        <textarea id="fRevImprove" placeholder="哪些是漏洞，下次怎么补"></textarea>
+      </div>
+    </details>
+
+    <div class="field" id="offerInfoBox" style="display:none">
+      <label style="font-size:13px;font-weight:700;color:var(--ink-2);margin-bottom:8px">💼 Offer 薪资福利信息（用于对比器）</label>
+      <div class="field-row" style="margin-bottom:10px">
+        <div class="field"><label>基本月薪</label><input type="text" id="fOb" placeholder="如 25K×14"></div>
+        <div class="field"><label>绩效 / 年终</label><input type="text" id="fOb2" placeholder="如 3个月"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>期权 / 股票</label><input type="text" id="fOs" placeholder="如 5万RSU/4年"></div>
+        <div class="field"><label>加班情况</label><input type="text" id="fOo" placeholder="如 965 / 1075"></div>
+      </div>
+      <div class="field">
+        <label>通勤时间</label>
+        <input type="text" id="fOc" placeholder="如 地铁40分钟">
+      </div>
+    </div>
+
     <button class="submit" id="btnSave">保存</button>
     <button class="delete-btn" id="btnDelete" style="display:none">删除这条记录</button>
+  </div>
+</div>
+
+<!-- 状态快捷切换菜单 -->
+<div class="st-menu-mask" id="stMenuMask">
+  <div class="mask" id="stMenuBg"></div>
+  <div class="st-menu">
+    <h4 id="stMenuTitle">切换状态</h4>
+    <div class="st-grid" id="stMenuGrid"></div>
   </div>
 </div>
 
@@ -493,12 +693,22 @@ const STATUS = {
   rejected:   { label: '被拒', color: '#94A3B8', av: 'linear-gradient(135deg,#94A3B8,#64748B)' },
 };
 const STATUS_ORDER = ['submitted', 'screening', 'interview1', 'interview2', 'interview3', 'hr', 'offer', 'declined', 'rejected'];
+/* 看板分组：把 9 个细状态归到 4 个阶段列 */
+const KANBAN_COLS = [
+  { k: 'applied', label: '已投递', color: '#FFC53D', statuses: ['submitted'] },
+  { k: 'active',  label: '进行中', color: '#4C7DFF', statuses: ['screening', 'interview1', 'interview2', 'interview3', 'hr'] },
+  { k: 'offer',   label: '已Offer', color: '#00C896', statuses: ['offer'] },
+  { k: 'closed',  label: '已结束', color: '#94A3B8', statuses: ['rejected', 'declined'] },
+];
 const STORE_KEY = 'interviewTracker.v1';
 
 /* ================= 数据 ================= */
 let records = [];
 let filter = 'all';
 let editingId = null;
+let viewMode = 'list';   // list / kanban / calendar / compare
+let calMonth = '';       // 日历当前月 YYYY-MM
+let stMenuId = null;     // 状态快捷菜单对应的记录
 
 function load() {
   try { records = JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
@@ -582,9 +792,9 @@ function renderList() {
   document.getElementById('listCount').textContent = listData.length + ' 条';
   if (!listData.length) {
     list.innerHTML = `<div class="empty">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg>
+      <div class="empty-art">${records.length ? '🗂️' : '🚀'}</div>
       <h3>${records.length ? '这个进度下还没有记录' : '还没有面试记录'}</h3>
-      <p>${records.length ? '试试切换其他进度筛选' : '点击右下角 + 按钮，添加第一条投递记录吧'}</p>
+      <p>${records.length ? '试试切换其他进度筛选' : '点击右下角 + 按钮，开启你的求职之旅吧'}</p>
     </div>`;
     return;
   }
@@ -607,6 +817,9 @@ function renderList() {
       else if (act === 'delete') confirmDelete(id);
     };
   });
+  list.querySelectorAll('.kc-st2').forEach(el => {
+    el.onclick = (e) => { e.stopPropagation(); openStMenu(el.closest('.card').dataset.id); };
+  });
 }
 function filterLabel() {
   if (filter === 'all') return '';
@@ -627,12 +840,14 @@ function cardHTML(r) {
   const isEnd = r.status === 'rejected' || r.status === 'declined';
   const isOffer = r.status === 'offer';
   const isActive = !isEnd && !isOffer;
+  const semClass = isOffer ? 'offer' : isEnd ? 'done' : isActive && ['submitted', 'screening'].includes(r.status) ? 'warn' : 'progress';
+  const hasReview = r.review && (r.review.questions || r.review.good || r.review.improve);
   return `
   <div class="card" data-id="${r.id}" style="--st:${st.color};--av:${st.av}">
     <div class="row1">
       <div class="avatar">${esc(initials(r.company))}</div>
       <div class="main">
-        <div class="company"><span class="name">${esc(r.company)}</span><span class="badge" style="background:${st.color}">${st.label}</span></div>
+        <div class="company"><span class="name">${esc(r.company)}</span><span class="badge sem ${semClass} kc-st2">${st.label} ▾</span></div>
         <div class="position">
           ${r.position ? `<span>${esc(r.position)}</span>` : ''}
           ${r.city ? `<span class="sep">·</span><span>📍${esc(r.city)}</span>` : ''}
@@ -646,6 +861,7 @@ function cardHTML(r) {
       ${undone ? `<span class="item">📌 ${undone} 项待办</span>` : ''}
     </div>
     ${todosHTML}
+    ${hasReview ? `<span class="review-pill">📝 已复盘</span>` : ''}
     <div class="actions">
       ${isActive ? `<button class="btn primary" data-act="advance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>${nextBtnLabel(r.status)}</button><button class="btn danger" data-act="reject">未通过</button>` : ''}
       ${isOffer ? `<button class="btn danger" data-act="decline">拒Offer</button>` : ''}
@@ -712,12 +928,27 @@ function openEditor(id) {
   document.getElementById('fDate').value = r ? r.nextDate : '';
   document.getElementById('fTime').value = r ? r.nextTime : '';
   document.getElementById('fNotes').value = r ? r.notes : '';
+  document.getElementById('fRevQ').value = r && r.review ? r.review.questions : '';
+  document.getElementById('fRevGood').value = r && r.review ? r.review.good : '';
+  document.getElementById('fRevImprove').value = r && r.review ? r.review.improve : '';
+  const oi = r && r.offerInfo ? r.offerInfo : {};
+  document.getElementById('fOb').value = oi.base || '';
+  document.getElementById('fOb2').value = oi.bonus || '';
+  document.getElementById('fOs').value = oi.stock || '';
+  document.getElementById('fOo').value = oi.overtime || '';
+  document.getElementById('fOc').value = oi.commute || '';
+  document.getElementById('offerInfoBox').style.display = document.getElementById('fStatus').value === 'offer' ? 'block' : 'none';
   renderTodoEditor(r ? r.todos || [] : []);
   document.getElementById('btnDelete').style.display = r ? 'block' : 'none';
   document.getElementById('editorMask').classList.add('show');
   setTimeout(() => document.getElementById('fCompany').focus(), 250);
 }
 function closeEditor() { document.getElementById('editorMask').classList.remove('show'); editingId = null; }
+
+/* 状态下拉切换时联动显示 Offer 信息区 */
+document.getElementById('fStatus').addEventListener('change', () => {
+  document.getElementById('offerInfoBox').style.display = document.getElementById('fStatus').value === 'offer' ? 'block' : 'none';
+});
 
 let todoDraft = [];
 function renderTodoEditor(todos) {
@@ -764,6 +995,7 @@ function saveEditor() {
   const company = document.getElementById('fCompany').value.trim();
   if (!company) { toast('请填写公司名称'); document.getElementById('fCompany').focus(); return; }
   const todos = todoDraft.filter(t => t.text.trim()).map(t => ({ id: t.id, text: t.text.trim(), done: t.done }));
+  const dataStatus = document.getElementById('fStatus').value;
   const data = {
     company,
     position: document.getElementById('fPosition').value.trim(),
@@ -775,6 +1007,18 @@ function saveEditor() {
     nextTime: document.getElementById('fTime').value,
     notes: document.getElementById('fNotes').value.trim(),
     todos,
+    review: {
+      questions: document.getElementById('fRevQ').value.trim(),
+      good: document.getElementById('fRevGood').value.trim(),
+      improve: document.getElementById('fRevImprove').value.trim(),
+    },
+    offerInfo: dataStatus === 'offer' ? {
+      base: document.getElementById('fOb').value.trim(),
+      bonus: document.getElementById('fOb2').value.trim(),
+      stock: document.getElementById('fOs').value.trim(),
+      overtime: document.getElementById('fOo').value.trim(),
+      commute: document.getElementById('fOc').value.trim(),
+    } : undefined,
   };
   if (editingId) {
     const r = records.find(x => x.id === editingId);
@@ -799,8 +1043,269 @@ function confirmDelete(id) {
 
 /* ================= 通用渲染 ================= */
 function renderAll() {
-  renderStats(); renderReminder(); renderChips(); renderList();
+  renderStats(); renderReminder(); renderChips(); renderFunnel();
+  document.querySelectorAll('.view-switch button').forEach(b => b.classList.toggle('active', b.dataset.view === viewMode));
+  const body = document.getElementById('list');
+  const titleEl = document.getElementById('listTitle');
+  const countEl = document.getElementById('listCount');
+  if (viewMode === 'kanban') { titleEl.textContent = '求职看板'; countEl.textContent = records.length + ' 条'; renderKanban(); }
+  else if (viewMode === 'calendar') { titleEl.textContent = '面试日历'; countEl.textContent = ''; renderCalendar(); }
+  else if (viewMode === 'compare') { titleEl.textContent = 'Offer 对比'; countEl.textContent = ''; renderCompare(); }
+  else { titleEl.textContent = filter === 'all' ? '全部面试' : STATUS[filter].label + ' · ' + filterLabel(); countEl.textContent = filtered().length + ' 条'; renderList(); }
 }
+
+/* ================= 转化率漏斗 ================= */
+function funnelData() {
+  const total = records.length;
+  const toInterview = records.filter(r => ['screening', 'interview1', 'interview2', 'interview3', 'hr', 'offer'].includes(r.status)).length;
+  const offer = records.filter(r => r.status === 'offer').length;
+  return {
+    total, toInterview, offer,
+    inviteRate: total ? Math.round(toInterview / total * 100) : 0,
+    offerRate: toInterview ? Math.round(offer / toInterview * 100) : 0,
+  };
+}
+function renderFunnel() {
+  const box = document.getElementById('funnelBox');
+  if (!records.length) { box.innerHTML = ''; return; }
+  const f = funnelData();
+  const max = Math.max(f.total, 1);
+  const bar = (n, color, label, note) => `
+    <div class="funnel-row">
+      <div class="f-label">${label}</div>
+      <div class="f-bar-wrap">
+        <div class="f-bar" style="width:${Math.max(8, n / max * 100)}%;background:${color}">${n}</div>
+        ${note ? `<span class="f-note">${note}</span>` : ''}
+      </div>
+    </div>`;
+  box.innerHTML = `
+    <div class="funnel-card">
+      <h2>求职转化漏斗</h2>
+      ${bar(f.total, '#94A3B8', '投递', '')}
+      ${bar(f.toInterview, '#4C7DFF', '进面试', f.inviteRate + '% 邀请率')}
+      ${bar(f.offer, '#00C896', '拿Offer', f.offerRate + '% 成功率')}
+      <div class="funnel-tip">投递 → 面试邀请率 <b>${f.inviteRate}%</b>；面试 → Offer 成功率 <b>${f.offerRate}%</b>。数据越多越有参考价值。</div>
+    </div>`;
+}
+
+/* ================= 看板 ================= */
+function renderKanban() {
+  const list = document.getElementById('list');
+  list.innerHTML = KANBAN_COLS.map(col => {
+    const items = records.filter(r => col.statuses.includes(r.status));
+    return `
+    <div class="kanban-col">
+      <div class="col-head">
+        <span class="col-dot" style="background:${col.color}"></span>
+        <span class="col-title">${col.label}</span>
+        <span class="col-count">${items.length}</span>
+      </div>
+      ${items.length ? items.map(kcCardHTML).join('') : `<div class="kanban-empty">暂无记录</div>`}
+    </div>`;
+  }).join('');
+  list.querySelectorAll('.kanban-card').forEach(card => {
+    card.onclick = (e) => {
+      if (e.target.closest('.kc-st')) return;
+      openEditor(card.dataset.id);
+    };
+  });
+  list.querySelectorAll('.kc-st').forEach(el => {
+    el.onclick = (e) => { e.stopPropagation(); openStMenu(el.closest('.kanban-card').dataset.id); };
+  });
+}
+function kcCardHTML(r) {
+  const st = STATUS[r.status];
+  const d = daysUntil(r.nextDate);
+  let next = '';
+  if (d !== null && d >= 0 && !['offer', 'rejected', 'declined'].includes(r.status)) {
+    next = `<span class="kc-next">${d === 0 ? '今天' : d === 1 ? '明天' : d + '天后'} ${r.nextTime || ''}</span>`;
+  }
+  return `
+  <div class="kanban-card" data-id="${r.id}">
+    <div class="kc-company"><span class="nm">${esc(r.company)}</span><span class="kc-st badge" style="background:${st.color}">${st.label} ▾</span></div>
+    <div class="kc-pos">${r.position ? esc(r.position) : ''}</div>
+    ${(next || r.city || r.salary) ? `<div class="kc-meta">${next}${r.city ? '📍' + esc(r.city) : ''}${r.salary ? '💰' + esc(r.salary) : ''}</div>` : ''}
+  </div>`;
+}
+
+/* ================= 日历 ================= */
+function calDays(yyyymm) {
+  const [y, m] = yyyymm.split('-').map(Number);
+  const first = new Date(y, m - 1, 1);
+  const startDow = (first.getDay() + 6) % 7; // 周一开头
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const cells = [];
+  for (let i = 0; i < startDow; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(yyyymm + '-' + String(d).padStart(2, '0'));
+  while (cells.length % 7) cells.push(null);
+  return cells;
+}
+function renderCalendar() {
+  if (!calMonth) calMonth = todayStr().slice(0, 7);
+  const list = document.getElementById('list');
+  const [y, m] = calMonth.split('-').map(Number);
+  const events = {};
+  records.forEach(r => {
+    if (r.nextDate && !['offer', 'rejected', 'declined'].includes(r.status)) {
+      (events[r.nextDate] = events[r.nextDate] || []).push(r);
+    }
+  });
+  const today = todayStr();
+  const cells = calDays(calMonth).map(date => {
+    if (!date) return `<button class="cal-day empty"></button>`;
+    const has = events[date];
+    const cls = ['cal-day'];
+    if (date === today) cls.push('today');
+    if (has && has.length) cls.push('has-events');
+    return `<button class="${cls.join(' ')}" data-date="${date}">${parseInt(date.slice(8), 10)}${has ? '<span class="cal-dot"></span>' : ''}</button>`;
+  }).join('');
+  const sel = document.querySelector('.cal-day-list');
+  const selDate = sel ? sel.dataset.date : null;
+  let dayList = '';
+  if (selDate && events[selDate]) {
+    dayList = `<div class="cal-day-list" data-date="${selDate}">
+      ${events[selDate].map(r => {
+        const st = STATUS[r.status];
+        return `<div class="item" data-id="${r.id}"><span class="t">${r.nextTime || ''}</span><span class="c">${esc(r.company)}${r.position ? ' · ' + esc(r.position) : ''}</span><span class="st" style="background:${st.color}">${st.label}</span></div>`;
+      }).join('')}
+      <button class="cal-ics" data-d="${selDate}">➕ 添加到系统日历（导出 .ics）</button>
+    </div>`;
+  } else if (selDate) {
+    dayList = `<div class="cal-day-list" data-date="${selDate}"><div style="text-align:center;color:var(--gray);padding:8px 0;font-size:12px">这天没有安排面试</div></div>`;
+  }
+  list.innerHTML = `
+    <div class="cal-card">
+      <div class="cal-head">
+        <div class="cal-title">${calMonth.split('-')[0]} 年 ${parseInt(calMonth.split('-')[1], 10)} 月</div>
+        <div class="cal-nav">
+          <button id="calPrev">‹</button>
+          <button id="calNext">›</button>
+        </div>
+      </div>
+      <div class="cal-grid">
+        ${['一','二','三','四','五','六','日'].map(d => `<div class="cal-dow">${d}</div>`).join('')}
+        ${cells}
+      </div>
+      ${dayList}
+    </div>`;
+  document.getElementById('calPrev').onclick = () => { calMonth = shiftMonth(calMonth, -1); renderCalendar(); };
+  document.getElementById('calNext').onclick = () => { calMonth = shiftMonth(calMonth, 1); renderCalendar(); };
+  list.querySelectorAll('.cal-day:not(.empty)').forEach(b => {
+    b.onclick = () => {
+      const prev = document.querySelector('.cal-day-list');
+      if (prev) prev.remove();
+      const date = b.dataset.date;
+      // 重新渲染以选中当天（简化：直接在容器后追加列表）
+      renderCalendar();
+      setTimeout(() => {
+        const box = document.createElement('div');
+        box.className = 'cal-day-list';
+        box.dataset.date = date;
+        const evs = events[date] || [];
+        if (evs.length) {
+          box.innerHTML = evs.map(r => {
+            const st = STATUS[r.status];
+            return `<div class="item" data-id="${r.id}"><span class="t">${r.nextTime || ''}</span><span class="c">${esc(r.company)}${r.position ? ' · ' + esc(r.position) : ''}</span><span class="st" style="background:${st.color}">${st.label}</span></div>`;
+          }).join('') + `<button class="cal-ics" data-d="${date}">➕ 添加到系统日历（导出 .ics）</button>`;
+        } else {
+          box.innerHTML = `<div style="text-align:center;color:var(--gray);padding:8px 0;font-size:12px">这天没有安排面试</div>`;
+        }
+        list.querySelector('.cal-card').appendChild(box);
+      }, 20);
+    };
+  });
+  list.querySelectorAll('.cal-day-list .item').forEach(it => {
+    it.onclick = () => openEditor(it.dataset.id);
+  });
+  list.querySelectorAll('.cal-ics').forEach(b => {
+    b.onclick = (e) => { e.stopPropagation(); exportICS(b.dataset.d); };
+  });
+}
+function shiftMonth(yyyymm, delta) {
+  const [y, m] = yyyymm.split('-').map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+function exportICS(dateStr) {
+  const evs = records.filter(r => r.nextDate === dateStr && !['offer', 'rejected', 'declined'].includes(r.status));
+  if (!evs.length) { toast('这天没有面试'); return; }
+  const stamp = (ds, ts) => {
+    const [y, m, d] = ds.split('-').map(Number);
+    if (ts) { const [hh, mm] = ts.split(':').map(Number); return new Date(y, m - 1, d, hh, mm); }
+    return new Date(y, m - 1, d, 9, 0);
+  };
+  const fmt = (dt) => dt.getFullYear() + String(dt.getMonth() + 1).padStart(2, '0') + String(dt.getDate()).padStart(2, '0') + 'T' + String(dt.getHours()).padStart(2, '0') + String(dt.getMinutes()).padStart(2, '0') + '00';
+  const now = new Date();
+  const stampNow = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + 'T' + String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0') + '00';
+  const escIcs = (s) => String(s || '').replace(/[\\;,]/g, m => '\\' + m).replace(/\n/g, '\\n');
+  const lines = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Qiuzhilu//CN',
+    'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+    ...evs.map(r => {
+      const start = stamp(dateStr, r.nextTime);
+      const end = new Date(start.getTime() + 60 * 60 * 1000);
+      return [
+        'BEGIN:VEVENT',
+        'UID:' + r.id + '@qiuzhilu',
+        'DTSTAMP:' + stampNow,
+        'DTSTART:' + fmt(start),
+        'DTEND:' + fmt(end),
+        'SUMMARY:' + escIcs(r.company + (r.position ? ' 面试 - ' + r.position : ' 面试')),
+        'DESCRIPTION:' + escIcs((r.link ? '岗位链接: ' + r.link + '\n' : '') + (r.notes || '')),
+        'LOCATION:' + escIcs(r.city || ''),
+        'END:VEVENT'
+      ].join('\r\n');
+    }),
+    'END:VCALENDAR'
+  ].join('\r\n');
+  download('面试_' + dateStr + '.ics', lines, 'text/calendar;charset=utf-8');
+  toast('已导出 ' + evs.length + ' 个日历事件，用「日历」App 打开即可添加');
+}
+
+/* ================= Offer 对比 ================= */
+function renderCompare() {
+  const list = document.getElementById('list');
+  const offers = records.filter(r => r.status === 'offer');
+  if (!offers.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-art">🏆</div><h3>还没有 Offer</h3><p>拿到 Offer 后会自动出现在这里，<br>帮你横向对比薪资福利，做出选择。</p></div>`;
+    return;
+  }
+  const get = (r, k) => (r.offerInfo && r.offerInfo[k] && String(r.offerInfo[k]).trim()) || '—';
+  list.innerHTML = `<div class="cmp-wrap"><table class="cmp-table">
+    <thead><tr><th>对比项</th>${offers.map(r => `<th>${esc(r.company)}</th>`).join('')}</tr></thead>
+    <tbody>
+      <tr><td class="co">公司</td>${offers.map(r => `<td>${esc(r.company)}${r.position ? '<br><span style="font-weight:400;color:var(--ink-2)">' + esc(r.position) + '</span>' : ''}</td>`).join('')}</tr>
+      <tr><td class="co">基本月薪</td>${offers.map(r => `<td>${esc(get(r, 'base'))}</td>`).join('')}</tr>
+      <tr><td class="co">绩效/年终</td>${offers.map(r => `<td>${esc(get(r, 'bonus'))}</td>`).join('')}</tr>
+      <tr><td class="co">期权/股票</td>${offers.map(r => `<td>${esc(get(r, 'stock'))}</td>`).join('')}</tr>
+      <tr><td class="co">加班情况</td>${offers.map(r => `<td>${esc(get(r, 'overtime'))}</td>`).join('')}</tr>
+      <tr><td class="co">通勤时间</td>${offers.map(r => `<td>${esc(get(r, 'commute'))}</td>`).join('')}</tr>
+    </tbody>
+  </table></div>
+  <div class="funnel-tip" style="margin-top:10px;padding:0 4px">💡 点击某一行记录可补充完整的薪资福利信息。</div>`;
+  list.querySelectorAll('.cmp-table td').forEach(() => {});
+}
+
+/* ================= 状态快捷切换 ================= */
+function openStMenu(id) {
+  const r = records.find(x => x.id === id);
+  if (!r) return;
+  stMenuId = id;
+  document.getElementById('stMenuTitle').textContent = '切换「' + r.company + '」的状态';
+  document.getElementById('stMenuGrid').innerHTML = STATUS_ORDER.map(k => {
+    const st = STATUS[k];
+    return `<button class="st-opt ${k === r.status ? 'cur' : ''}" data-k="${k}" style="${k === r.status ? 'background:' + st.color : ''}">${st.label}</button>`;
+  }).join('');
+  document.getElementById('stMenuGrid').querySelectorAll('.st-opt').forEach(b => {
+    b.onclick = () => {
+      const rec = records.find(x => x.id === stMenuId);
+      if (rec) { rec.status = b.dataset.k; rec.updatedAt = Date.now(); save(); renderAll(); toast('已切换为「' + STATUS[b.dataset.k].label + '」'); }
+      closeStMenu();
+    };
+  });
+  document.getElementById('stMenuMask').classList.add('show');
+}
+function closeStMenu() { document.getElementById('stMenuMask').classList.remove('show'); stMenuId = null; }
 
 /* ================= 导出 / 备份 ================= */
 function download(filename, content, mime) {
@@ -917,6 +1422,12 @@ document.getElementById('optClear').onclick = () => {
 };
 document.getElementById('cfOk').onclick = () => { const cb = cfCallback; closeConfirm(); if (cb) cb(); };
 document.getElementById('cfCancel').onclick = closeConfirm;
+
+/* 视图切换 */
+document.querySelectorAll('.view-switch button').forEach(b => b.onclick = () => { viewMode = b.dataset.view; renderAll(); });
+
+/* 状态快捷切换菜单 */
+document.getElementById('stMenuBg').onclick = closeStMenu;
 
 /* ================= 启动 ================= */
 fillStatusSelect();
