@@ -38,13 +38,27 @@
 2. 点分享按钮 → 「添加到主屏幕」
 3. 数据保存在手机本地（localStorage），无需联网，电脑关机不影响使用
 
-## Qucik Start（GitHub Pages）
+## Quick Start（GitHub Pages）
 
 1. 新建 **Public** 仓库，把本仓库所有文件上传（网页端 Add file → Upload files 即可）
 2. 仓库 **Settings → Pages** → Source 选 `Deploy from a branch` → 分支选 `main` → Save
 3. 等 1~2 分钟，访问 `https://<你的用户名>.github.io/<仓库名>/qiuzhilu/`
 
 **更新内容**：改完文件重新上传覆盖即可，GitHub 自动更新，手机刷新（或关闭重开）生效。
+
+## 常见问题
+
+### 打开链接是 404？
+
+说明 GitHub Pages 还没开启（或配置不对），按下面步骤操作一次：
+
+1. 进仓库的 **Settings**（齿轮图标）
+2. 左侧菜单找到 **Pages**
+3. **Source** 选 `Deploy from a branch`
+4. **Branch** 选 `main`、**文件夹**选 `/` (root) → 点 **Save**
+5. 等 1~2 分钟，刷新页面，GitHub 会显示绿色横幅 **"Your site is live at ..."**，并给出链接
+6. 这个链接就是部署地址，格式如：`https://lexplain.github.io/Tools/qiuzhilu/`
+7. 用 iPhone Safari 打开这个完整链接 → 点分享 → **添加到主屏幕**，就搞定啦
 
 ## 如何添加新应用（重点）
 
