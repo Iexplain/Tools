@@ -2,18 +2,100 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="refresh" content="0; url=./qiuzhilu/">
-<title>Tools</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>我的小工具</title>
+<meta name="theme-color" content="#1F2937">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='2' width='20' height='20' rx='6' fill='%231F2937'/%3E%3Cpath d='M7 8h10M7 12h10M7 16h6' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
-  body { font: 16px/1.6 -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-         background:#fafafa; color:#222; margin:0; padding:48px 20px; text-align:center; }
-  a { color:#0969da; text-decoration:none; }
-  a:hover { text-decoration:underline; }
+  :root {
+    --bg-start: #F0F4F8;
+    --bg-end: #FAFBFC;
+    --card: #FFFFFF;
+    --ink: #1F2937;
+    --ink-2: #6B7280;
+    --gray: #94A3B8;
+    --gray-light: #EEF2F7;
+    --shadow: 0 6px 20px rgba(31, 41, 55, .08), 0 2px 6px rgba(31, 41, 55, .04);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(170deg, var(--bg-start) 0%, var(--bg-end) 100%);
+    background-attachment: fixed;
+    color: var(--ink);
+    min-height: 100dvh;
+  }
+  .page {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: calc(20px + env(safe-area-inset-top)) 20px calc(40px + var(--safe-bottom));
+  }
+  header { margin-bottom: 22px; }
+  h1 { font-size: 24px; font-weight: 800; letter-spacing: .3px; }
+  .sub { font-size: 13px; color: var(--ink-2); margin-top: 4px; }
+  .app-list { display: flex; flex-direction: column; gap: 14px; }
+  .app-card {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--card); border-radius: 18px; padding: 16px;
+    box-shadow: var(--shadow); text-decoration: none; color: inherit;
+    transition: transform .15s;
+  }
+  .app-card:active { transform: scale(.98); }
+  .app-icon {
+    width: 52px; height: 52px; border-radius: 16px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .12);
+  }
+  .app-icon.q { background: linear-gradient(135deg, #00C896, #4C7DFF); }
+  .app-icon.j { background: linear-gradient(135deg, #FF6B6B, #FF8A5C); }
+  .app-main { flex: 1; min-width: 0; }
+  .app-name { font-size: 16px; font-weight: 700; }
+  .app-desc { font-size: 12px; color: var(--ink-2); margin-top: 3px; line-height: 1.5; }
+  .app-arrow { color: var(--gray); flex-shrink: 0; }
+  .app-arrow svg { width: 18px; height: 18px; }
+
+  footer {
+    margin-top: 28px; text-align: center;
+    font-size: 12px; color: var(--gray); line-height: 1.6;
+  }
+  footer a { color: var(--ink-2); text-decoration: none; }
 </style>
 </head>
 <body>
-<p>正在跳转到 <strong>求职录</strong>……</p>
-<p>如果没有自动跳转，请点击：<a href="./qiuzhilu/">https://lexplain.github.io/Tools/qiuzhilu/</a></p>
-<script>location.replace('./qiuzhilu/');</script>
+<div class="page">
+  <header>
+    <h1>我的小工具</h1>
+    <p class="sub">添加到主屏幕，像原生 App 一样使用 · 数据本地存储</p>
+  </header>
+
+  <div class="app-list">
+    <a class="app-card" href="./qiuzhilu/">
+      <div class="app-icon q">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v11a2.5 2.5 0 0 1-2.5 2.5h-7L7 21.5V19H6.5A2.5 2.5 0 0 1 4 16.5v-11Z" fill="#fff"/><path d="M8.5 9.5h7M8.5 12.5h7M8.5 15.5h4" stroke="#00A97F" stroke-width="1.8" stroke-linecap="round"/><path d="M16 8.2l.9.9L19 6.8" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="app-main">
+        <div class="app-name">求职录</div>
+        <div class="app-desc">求职投递与面试进度记录，看板式跟踪，自动提醒待办</div>
+      </div>
+      <div class="app-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
+    </a>
+
+    <a class="app-card" href="./jizhangji/">
+      <div class="app-icon j">💰</div>
+      <div class="app-main">
+        <div class="app-name">记账本</div>
+        <div class="app-desc">简洁的收支记账工具，按月统计，分类汇总，导出 CSV / JSON</div>
+      </div>
+      <div class="app-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
+    </a>
+  </div>
+
+  <footer>
+    <p>💡 用 Safari 打开任一应用 → 分享 → 添加到主屏幕</p>
+  </footer>
+</div>
 </body>
 </html>
