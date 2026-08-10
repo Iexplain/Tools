@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>求职录</title>
+<meta name="description" content="求职录 - 记录每一次求职投递与面试进程">
+<meta name="theme-color" content="#00C896">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="求职录">
+<style>
+  :root {
+    --primary: #00C896;
+    --primary-dark: #00A97F;
+    --primary-light: #D6F8EE;
+    --blue: #4C7DFF;
+    --blue-light: #E8EEFF;
+    --orange: #FF8A5C;
+    --orange-light: #FFF0E9;
+    --yellow: #FFC53D;
+    --yellow-light: #FFF6DF;
+    --purple: #7C5CFF;
+    --purple-light: #EFEAFF;
+    --teal: #00B8D9;
+    --teal-light: #E0F7FB;
+    --gray: #94A3B8;
+    --gray-light: #EEF2F7;
+    --ink: #1F2937;
+    --ink-2: #6B7280;
+    --bg: #F4FBF8;
+    --card: #FFFFFF;
+    --radius: 20px;
+    --shadow: 0 6px 20px rgba(16, 185, 129, .08), 0 2px 6px rgba(31, 41, 55, .04);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(170deg, #EAFBF4 0%, #F4FBF8 40%, #EFF4FF 100%);
+    background-attachment: fixed;
+    color: var(--ink);
+    min-height: 100dvh;
+  }
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: calc(12px + env(safe-area-inset-top)) 16px calc(110px + var(--safe-bottom));
+  }
+
+  /* ===== Header ===== */
+  header.top {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 2px 14px;
+  }
+  .logo {
+    width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+    background: linear-gradient(135deg, #00C896, #4C7DFF);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 200, 150, .35);
+  }
+  .logo svg { width: 24px; height: 24px; }
+  .title-box { flex: 1; }
+  .title-box h1 { font-size: 20px; font-weight: 700; letter-spacing: .5px; }
+  .title-box p { font-size: 12px; color: var(--ink-2); margin-top: 1px; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 12px; border: none;
+    background: var(--card); box-shadow: var(--shadow); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-2); flex-shrink: 0;
+  }
+  .icon-btn:active { transform: scale(.93); }
+  .icon-btn svg { width: 20px; height: 20px; }
+
+  /* ===== Stats ===== */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    margin-bottom: 14px;
+  }
+  .stat-card {
+    background: var(--card); border-radius: 16px; padding: 12px 6px;
+    text-align: center; box-shadow: var(--shadow);
+  }
+  .stat-card .num { font-size: 22px; font-weight: 800; line-height: 1.1; }
+  .stat-card .lbl { font-size: 11px; color: var(--ink-2); margin-top: 3px; }
+  .stat-card .num.green { color: var(--primary-dark); }
+  .stat-card .num.blue { color: var(--blue); }
+  .stat-card .num.orange { color: var(--orange); }
+  .stat-card .num.gray { color: var(--ink-2); }
+
+  /* ===== Upcoming reminder ===== */
+  .reminder {
+    display: none; margin-bottom: 14px;
+    background: linear-gradient(120deg, #FFF6DF, #FFEBD3);
+    border-radius: var(--radius); padding: 14px 16px;
+    box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .reminder.show { display: flex; align-items: center; gap: 12px; }
+  .reminder .bell {
+    width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 8px rgba(255, 197, 61, .4);
+  }
+  .reminder .bell svg { width: 22px; height: 22px; color: #E8A000; }
+  .reminder .txt { flex: 1; min-width: 0; }
+  .reminder .txt b { font-size: 14px; display: block; }
+  .reminder .txt span { font-size: 12px; color: #8a6d1f; display: block; margin-top: 2px; }
+  .reminder .countdown {
+    font-size: 13px; font-weight: 800; color: #E8A000; white-space: nowrap;
+    background: #fff; border-radius: 20px; padding: 5px 12px;
+  }
+
+  /* ===== Filter chips ===== */
+  .chips {
+    display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 14px;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0; border: none; cursor: pointer;
+    background: var(--card); color: var(--ink-2);
+    font-size: 13px; font-weight: 600;
+    padding: 8px 14px; border-radius: 20px; box-shadow: var(--shadow);
+    transition: all .18s;
+  }
+  .chip.active { color: #fff; background: var(--primary); box-shadow: 0 4px 10px rgba(0, 200, 150, .35); }
+  .chip .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
+  .chip.active .dot { background: #fff; }
+
+  /* ===== Section ===== */
+  .section-title {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 6px 2px 10px;
+  }
+  .section-title h2 { font-size: 16px; font-weight: 700; }
+  .section-title .count { font-size: 12px; color: var(--ink-2); background: var(--card); padding: 3px 10px; border-radius: 12px; box-shadow: var(--shadow); }
+
+  /* ===== Card ===== */
+  .card {
+    background: var(--card); border-radius: var(--radius); padding: 14px 16px;
+    margin-bottom: 12px; box-shadow: var(--shadow);
+    cursor: pointer; position: relative; overflow: hidden;
+    transition: transform .15s;
+  }
+  .card:active { transform: scale(.98); }
+  .card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+    background: var(--st, var(--gray));
+  }
+  .card .row1 { display: flex; align-items: flex-start; gap: 10px; }
+  .card .avatar {
+    width: 44px; height: 44px; border-radius: 14px; flex-shrink: 0;
+    background: var(--av, var(--gray-light));
+    color: #fff; font-weight: 800; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card .main { flex: 1; min-width: 0; }
+  .card .company { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .card .company .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card .position { font-size: 13px; color: var(--ink-2); margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .card .position .sep { color: var(--gray); }
+  .badge {
+    font-size: 11px; font-weight: 700; color: #fff;
+    padding: 3px 10px; border-radius: 12px; flex-shrink: 0;
+  }
+  .card .meta { display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+  .card .meta .item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--ink-2); }
+  .card .meta .item svg { width: 14px; height: 14px; }
+  .card .next { color: #E8A000; font-weight: 700; }
+  .card .todos { margin-top: 10px; }
+  .card .todo-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; color: var(--ink-2); background: var(--gray-light);
+    padding: 4px 10px; border-radius: 10px; margin: 0 6px 4px 0;
+  }
+  .card .todo-pill.done { color: var(--gray); text-decoration: line-through; }
+  .card .actions { display: flex; gap: 8px; margin-top: 12px; }
+  .btn {
+    border: none; cursor: pointer; font-size: 13px; font-weight: 700;
+    padding: 9px 14px; border-radius: 14px; flex: 1;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    transition: all .15s;
+  }
+  .btn:active { transform: scale(.95); }
+  .btn svg { width: 15px; height: 15px; }
+  .btn.primary { background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(0, 200, 150, .3); }
+  .btn.ghost { background: var(--gray-light); color: var(--ink-2); }
+  .btn.danger { background: #FEE2E2; color: #DC2626; }
+
+  /* ===== Empty ===== */
+  .empty {
+    text-align: center; padding: 48px 20px; color: var(--ink-2);
+  }
+  .empty svg { width: 72px; height: 72px; opacity: .5; margin-bottom: 12px; }
+  .empty h3 { font-size: 16px; color: var(--ink); margin-bottom: 6px; }
+  .empty p { font-size: 13px; line-height: 1.6; }
+
+  /* ===== FAB ===== */
+  .fab {
+    position: fixed; right: max(20px, calc(50% - 220px)); bottom: calc(24px + var(--safe-bottom));
+    width: 58px; height: 58px; border-radius: 50%; border: none; cursor: pointer;
+    background: linear-gradient(135deg, #00C896, #00A97F);
+    color: #fff; box-shadow: 0 8px 20px rgba(0, 200, 150, .45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 50; transition: transform .15s;
+  }
+  .fab:active { transform: scale(.9); }
+  .fab svg { width: 28px; height: 28px; }
+
+  /* ===== Modal ===== */
+  .modal-mask {
+    position: fixed; inset: 0; background: rgba(31, 41, 55, .45);
+    z-index: 100; display: none; align-items: flex-end; justify-content: center;
+    opacity: 0; transition: opacity .2s;
+  }
+  .modal-mask.show { display: flex; opacity: 1; }
+  .modal {
+    background: #fff; width: 100%; max-width: 480px;
+    border-radius: 24px 24px 0 0; padding: 20px 20px calc(24px + var(--safe-bottom));
+    max-height: 90dvh; overflow-y: auto;
+    transform: translateY(40px); transition: transform .25s ease;
+    -webkit-overflow-scrolling: touch;
+  }
+  .modal-mask.show .modal { transform: translateY(0); }
+  .modal .grab { width: 40px; height: 4px; border-radius: 2px; background: var(--gray-light); margin: 0 auto 16px; }
+  .modal h3 { font-size: 18px; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+  .modal h3 .close { width: 30px; height: 30px; border: none; background: var(--gray-light); border-radius: 50%; cursor: pointer; color: var(--ink-2); font-size: 14px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 13px; font-weight: 700; color: var(--ink-2); margin-bottom: 6px; }
+  .field label .req { color: var(--orange); }
+  .field input, .field select, .field textarea {
+    width: 100%; border: 2px solid var(--gray-light); border-radius: 14px;
+    padding: 11px 14px; font-size: 15px; font-family: inherit; color: var(--ink);
+    background: #FAFCFB; outline: none; transition: border-color .15s;
+    -webkit-appearance: none; appearance: none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--primary); background: #fff; }
+  .field textarea { resize: vertical; min-height: 64px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: ''; position: absolute; right: 14px; top: 50%;
+    width: 8px; height: 8px; border-right: 2px solid var(--ink-2); border-bottom: 2px solid var(--ink-2);
+    transform: translateY(-70%) rotate(45deg); pointer-events: none;
+  }
+
+  /* todos editor */
+  .todo-list { margin-top: 4px; }
+  .todo-item {
+    display: flex; align-items: center; gap: 10px;
+    background: #FAFCFB; border-radius: 12px; padding: 8px 12px; margin-bottom: 8px;
+  }
+  .todo-item .tcheck {
+    width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--gray-light);
+    flex-shrink: 0; cursor: pointer; background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+  }
+  .todo-item .tcheck.checked { background: var(--primary); border-color: var(--primary); }
+  .todo-item .tcheck svg { width: 13px; height: 13px; color: #fff; display: none; }
+  .todo-item .tcheck.checked svg { display: block; }
+  .todo-item input[type=text] {
+    flex: 1; border: none; background: transparent; font-size: 14px; outline: none; color: var(--ink); font-family: inherit;
+  }
+  .todo-item input[type=text].done { text-decoration: line-through; color: var(--gray); }
+  .todo-item .tdel { border: none; background: none; color: var(--gray); cursor: pointer; font-size: 16px; padding: 2px 4px; }
+  .btn.add-todo {
+    flex: none; background: var(--primary-light); color: var(--primary-dark);
+    padding: 8px 14px; font-size: 13px;
+  }
+  .modal .submit {
+    width: 100%; padding: 14px; font-size: 16px; border-radius: 16px; margin-top: 8px;
+    background: linear-gradient(135deg, #00C896, #00A97F); color: #fff; border: none;
+    font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(0, 200, 150, .35);
+  }
+  .modal .submit:active { transform: scale(.98); }
+  .modal .delete-btn {
+    width: 100%; padding: 12px; border-radius: 16px; margin-top: 10px;
+    background: #FEF2F2; color: #DC2626; border: none; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+
+  /* ===== Toast ===== */
+  .toast {
+    position: fixed; left: 50%; transform: translateX(-50%) translateY(20px);
+    bottom: calc(100px + var(--safe-bottom)); background: rgba(31, 41, 55, .92); color: #fff;
+    font-size: 13px; padding: 10px 18px; border-radius: 22px; z-index: 200;
+    opacity: 0; pointer-events: none; transition: all .25s; max-width: 84vw; text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ===== Confirm ===== */
+  .confirm-mask { position: fixed; inset: 0; background: rgba(31, 41, 55, .5); z-index: 150; display: none; align-items: center; justify-content: center; }
+  .confirm-mask.show { display: flex; }
+  .confirm-box {
+    background: #fff; border-radius: 20px; padding: 22px; width: 82%; max-width: 320px;
+    text-align: center; animation: pop .2s;
+  }
+  @keyframes pop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .confirm-box h4 { font-size: 16px; margin-bottom: 8px; }
+  .confirm-box p { font-size: 13px; color: var(--ink-2); margin-bottom: 18px; line-height: 1.6; }
+  .confirm-box .btns { display: flex; gap: 10px; }
+  .confirm-box .btns button { flex: 1; padding: 11px; border-radius: 14px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .confirm-box .btns .ok { background: #DC2626; color: #fff; }
+  .confirm-box .btns .cancel { background: var(--gray-light); color: var(--ink-2); }
+
+  /* export menu */
+  .export-menu { display: none; }
+  .export-menu.show { display: block; position: fixed; inset: 0; z-index: 120; }
+  .export-menu .mask { position: absolute; inset: 0; background: rgba(31, 41, 55, .35); }
+  .export-menu .sheet {
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px; background: #fff;
+    border-radius: 24px 24px 0 0; padding: 20px 20px calc(20px + var(--safe-bottom));
+    animation: slideup .25s;
+  }
+  @keyframes slideup { from { transform: translateX(-50%) translateY(40px); } to { transform: translateX(-50%) translateY(0); } }
+  .export-menu .sheet h3 { font-size: 17px; font-weight: 800; text-align: center; margin-bottom: 14px; }
+  .export-menu .opt {
+    display: flex; align-items: center; gap: 12px; width: 100%;
+    padding: 13px 14px; border-radius: 14px; border: none; background: #F6F9F8;
+    font-size: 15px; font-weight: 600; color: var(--ink); cursor: pointer; margin-bottom: 8px;
+    text-align: left; font-family: inherit;
+  }
+  .export-menu .opt svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .export-menu .opt small { display: block; font-size: 12px; color: var(--ink-2); font-weight: 400; margin-top: 2px; }
+
+  .install-hint {
+    margin-bottom: 14px; background: var(--card); border-radius: var(--radius);
+    padding: 14px 16px; box-shadow: var(--shadow); font-size: 13px; color: var(--ink-2); line-height: 1.7;
+    display: none;
+  }
+  .install-hint.show { display: block; }
+  .install-hint b { color: var(--primary-dark); }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v11a2.5 2.5 0 0 1-2.5 2.5h-7L7 21.5V19H6.5A2.5 2.5 0 0 1 4 16.5v-11Z" fill="#fff" opacity=".95"/><path d="M8.5 9.5h7M8.5 12.5h7M8.5 15.5h4" stroke="#00A97F" stroke-width="1.8" stroke-linecap="round"/><path d="M16 8.2l.9.9L19 6.8" stroke="#00C896" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="title-box">
+      <h1>求职录</h1>
+      <p>靠近你就靠近了痛苦，远离你就远离了幸福</p>
+    </div>
+    <button class="icon-btn" id="btnExport" aria-label="导出数据">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+    </button>
+  </header>
+
+  <div class="install-hint" id="installHint">
+    💡 <b>小提示：</b>点击 Safari 底部的<b>分享按钮</b>，选择<b>「添加到主屏幕」</b>，即可像 App 一样全屏使用，还能离线打开。
+  </div>
+
+  <div class="stats">
+    <div class="stat-card"><div class="num green" id="stActive">0</div><div class="lbl">求职中</div></div>
+    <div class="stat-card"><div class="num blue" id="stUpcoming">0</div><div class="lbl">待面试</div></div>
+    <div class="stat-card"><div class="num orange" id="stOffer">0</div><div class="lbl">Offer</div></div>
+    <div class="stat-card"><div class="num gray" id="stTotal">0</div><div class="lbl">累计投递</div></div>
+  </div>
+
+  <div class="reminder" id="reminder">
+    <div class="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+    <div class="txt"><b id="remTitle">即将面试</b><span id="remSub"></span></div>
+    <div class="countdown" id="remCount"></div>
+  </div>
+
+  <div class="chips" id="chips"></div>
+
+  <div class="section-title">
+    <h2 id="listTitle">全部面试</h2>
+    <span class="count" id="listCount">0 条</span>
+  </div>
+
+  <div id="list"></div>
+</div>
+
+<button class="fab" id="btnAdd" aria-label="新增面试记录">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+
+<!-- Editor modal -->
+<div class="modal-mask" id="editorMask">
+  <div class="modal">
+    <div class="grab"></div>
+    <h3 id="editorTitle">新增面试记录 <button class="close" id="editorClose">✕</button></h3>
+    <div class="field">
+      <label>公司名称 <span class="req">*</span></label>
+      <input type="text" id="fCompany" placeholder="例如：腾讯">
+    </div>
+    <div class="field">
+      <label>应聘职位</label>
+      <input type="text" id="fPosition" placeholder="例如：产品经理">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>城市</label>
+        <input type="text" id="fCity" placeholder="例如：深圳">
+      </div>
+      <div class="field">
+        <label>薪资范围</label>
+        <input type="text" id="fSalary" placeholder="例如：15-20K">
+      </div>
+    </div>
+    <div class="field">
+      <label>岗位链接</label>
+      <input type="url" id="fLink" placeholder="https://...（选填）">
+    </div>
+    <div class="field">
+      <label>当前进度</label>
+      <div class="select-wrap">
+        <select id="fStatus"></select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>下次面试日期</label>
+        <input type="date" id="fDate">
+      </div>
+      <div class="field">
+        <label>时间</label>
+        <input type="time" id="fTime">
+      </div>
+    </div>
+    <div class="field">
+      <label>待办事项</label>
+      <div class="todo-list" id="todoList"></div>
+      <button class="btn add-todo" id="btnAddTodo">+ 添加待办</button>
+    </div>
+    <div class="field">
+      <label>备注</label>
+      <textarea id="fNotes" placeholder="面试要点、联系人、复盘记录……"></textarea>
+    </div>
+    <button class="submit" id="btnSave">保存</button>
+    <button class="delete-btn" id="btnDelete" style="display:none">删除这条记录</button>
+  </div>
+</div>
+
+<!-- Export sheet -->
+<div class="export-menu" id="exportMenu">
+  <div class="mask" id="exportMask"></div>
+  <div class="sheet">
+    <h3>数据导出 / 备份</h3>
+    <button class="opt" id="optCsv">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#00A97F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>
+      <span>导出 Excel（CSV 文件）<small>可用 Excel / WPS 打开，方便整理统计</small></span>
+    </button>
+    <button class="opt" id="optJson">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#4C7DFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+      <span>备份全部数据（JSON）<small>完整备份，换手机时可导入恢复</small></span>
+    </button>
+    <button class="opt" id="optImport">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#7C5CFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+      <span>从备份导入恢复<small>选择之前导出的 JSON 备份文件</small></span>
+    </button>
+    <button class="opt" id="optClear">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+      <span>清空全部数据<small>仅删除本机数据，操作前请先备份</small></span>
+    </button>
+  </div>
+</div>
+
+<div class="confirm-mask" id="confirmMask">
+  <div class="confirm-box">
+    <h4 id="cfTitle">确认操作</h4>
+    <p id="cfText"></p>
+    <div class="btns">
+      <button class="cancel" id="cfCancel">取消</button>
+      <button class="ok" id="cfOk">确认</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<input type="file" id="fileImport" accept=".json,application/json" style="display:none">
+
+<script>
+'use strict';
+/* ================= 状态定义 ================= */
+const STATUS = {
+  submitted:  { label: '已投递', color: '#FFC53D', av: 'linear-gradient(135deg,#FFC53D,#F5A623)' },
+  screening:  { label: '筛选中', color: '#FF8A5C', av: 'linear-gradient(135deg,#FF8A5C,#F4683B)' },
+  interview1: { label: '一面',   color: '#4C7DFF', av: 'linear-gradient(135deg,#4C7DFF,#3B5BDB)' },
+  interview2: { label: '二面',   color: '#7C5CFF', av: 'linear-gradient(135deg,#7C5CFF,#5B3FE0)' },
+  interview3: { label: '三面',   color: '#00B8D9', av: 'linear-gradient(135deg,#00B8D9,#0091AB)' },
+  hr:         { label: 'HR面',   color: '#F068A8', av: 'linear-gradient(135deg,#F068A8,#D64E8E)' },
+  offer:      { label: '已Offer',color: '#00C896', av: 'linear-gradient(135deg,#00C896,#00A97F)' },
+  declined:   { label: '拒Offer', color: '#475569', av: 'linear-gradient(135deg,#64748B,#475569)' },
+  rejected:   { label: '被拒', color: '#94A3B8', av: 'linear-gradient(135deg,#94A3B8,#64748B)' },
+};
+const STATUS_ORDER = ['submitted', 'screening', 'interview1', 'interview2', 'interview3', 'hr', 'offer', 'declined', 'rejected'];
+const STORE_KEY = 'interviewTracker.v1';
+
+/* ================= 数据 ================= */
+let records = [];
+let filter = 'all';
+let editingId = null;
+
+function load() {
+  try { records = JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+  catch (e) { records = []; }
+  // 数据迁移 v2：旧「终面(final)」→「HR面(hr)」；未知状态兜底为「已投递」
+  let migrated = false;
+  records.forEach(r => {
+    if (r.status === 'final') { r.status = 'hr'; migrated = true; }
+    else if (!STATUS[r.status]) { r.status = 'submitted'; migrated = true; }
+  });
+  if (migrated) save();
+}
+function save() {
+  localStorage.setItem(STORE_KEY, JSON.stringify(records));
+}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const t = new Date(todayStr() + 'T00:00:00');
+  const d = new Date(dateStr + 'T00:00:00');
+  return Math.round((d - t) / 86400000);
+}
+
+/* ================= 渲染：chips ================= */
+function renderChips() {
+  const counts = { all: records.length };
+  STATUS_ORDER.forEach(k => counts[k] = records.filter(r => r.status === k).length);
+  const chips = document.getElementById('chips');
+  const defs = [{ k: 'all', label: '全部', dot: null }];
+  STATUS_ORDER.forEach(k => defs.push({ k, label: STATUS[k].label, dot: STATUS[k].color }));
+  chips.innerHTML = defs.map(d => `
+    <button class="chip ${filter === d.k ? 'active' : ''}" data-k="${d.k}">
+      ${d.dot ? `<span class="dot" style="background:${d.dot}"></span>` : ''}${d.label}
+      <span style="opacity:.75;margin-left:2px">${counts[d.k] || ''}</span>
+    </button>`).join('');
+  chips.querySelectorAll('.chip').forEach(c => c.onclick = () => { filter = c.dataset.k; renderAll(); });
+}
+
+/* ================= 渲染：统计 ================= */
+function renderStats() {
+  const active = records.filter(r => !['offer', 'rejected', 'declined'].includes(r.status)).length;
+  const upcoming = records.filter(r => { const d = daysUntil(r.nextDate); return d !== null && d >= 0; }).length;
+  const offer = records.filter(r => r.status === 'offer').length;
+  document.getElementById('stActive').textContent = active;
+  document.getElementById('stUpcoming').textContent = upcoming;
+  document.getElementById('stOffer').textContent = offer;
+  document.getElementById('stTotal').textContent = records.length;
+}
+
+/* ================= 渲染：提醒 ================= */
+function renderReminder() {
+  const box = document.getElementById('reminder');
+  const upcoming = records
+    .filter(r => r.nextDate && daysUntil(r.nextDate) >= 0 && !['offer', 'rejected', 'declined'].includes(r.status))
+    .sort((a, b) => a.nextDate.localeCompare(b.nextDate) || (a.nextTime || '').localeCompare(b.nextTime || ''));
+  if (!upcoming.length) { box.classList.remove('show'); return; }
+  const r = upcoming[0];
+  const d = daysUntil(r.nextDate);
+  let cd = '今天';
+  if (d === 1) cd = '明天';
+  else if (d === 2) cd = '后天';
+  else if (d > 2) cd = d + '天后';
+  document.getElementById('remTitle').textContent = '⏰ ' + r.company + ' 即将面试';
+  document.getElementById('remSub').textContent = `${r.position || '面试'} · ${r.nextDate}${r.nextTime ? ' ' + r.nextTime : ''}`;
+  document.getElementById('remCount').textContent = cd;
+  box.classList.add('show');
+}
+
+/* ================= 渲染：列表 ================= */
+function filtered() {
+  return filter === 'all' ? records : records.filter(r => r.status === filter);
+}
+function renderList() {
+  const list = document.getElementById('list');
+  const listData = filtered();
+  document.getElementById('listTitle').textContent = filter === 'all' ? '全部面试' : STATUS[filter].label + ' · ' + filterLabel();
+  document.getElementById('listCount').textContent = listData.length + ' 条';
+  if (!listData.length) {
+    list.innerHTML = `<div class="empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg>
+      <h3>${records.length ? '这个进度下还没有记录' : '还没有面试记录'}</h3>
+      <p>${records.length ? '试试切换其他进度筛选' : '点击右下角 + 按钮，添加第一条投递记录吧'}</p>
+    </div>`;
+    return;
+  }
+  list.innerHTML = listData.map(r => cardHTML(r)).join('');
+  list.querySelectorAll('.card').forEach(card => {
+    card.onclick = (e) => {
+      if (e.target.closest('.btn')) return;
+      openEditor(card.dataset.id);
+    };
+  });
+  list.querySelectorAll('[data-act]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const id = btn.closest('.card').dataset.id;
+      const act = btn.dataset.act;
+      if (act === 'advance') advanceStatus(id);
+      else if (act === 'reject') rejectRecord(id);
+      else if (act === 'decline') declineOffer(id);
+      else if (act === 'edit') openEditor(id);
+      else if (act === 'delete') confirmDelete(id);
+    };
+  });
+}
+function filterLabel() {
+  if (filter === 'all') return '';
+  if (filter === 'interview1' || filter === 'interview2' || filter === 'interview3' || filter === 'hr') return '面试中';
+  return '';
+}
+function cardHTML(r) {
+  const st = STATUS[r.status];
+  const d = daysUntil(r.nextDate);
+  let nextHTML = '';
+  if (d !== null && d >= 0 && !['offer', 'rejected', 'declined'].includes(r.status)) {
+    const lbl = d === 0 ? '今天' : d === 1 ? '明天' : d === 2 ? '后天' : d + '天后';
+    nextHTML = `<span class="item next">📅 ${r.nextDate}${r.nextTime ? ' ' + r.nextTime : ''}（${lbl}）</span>`;
+  }
+  const undone = r.todos ? r.todos.filter(t => !t.done).length : 0;
+  const todosHTML = r.todos && r.todos.length
+    ? `<div class="todos">${r.todos.slice(0, 2).map(t => `<span class="todo-pill ${t.done ? 'done' : ''}">${t.done ? '✓' : '○'} ${esc(t.text)}</span>`).join('')}${r.todos.length > 2 ? `<span class="todo-pill">+${r.todos.length - 2}</span>` : ''}</div>` : '';
+  const isEnd = r.status === 'rejected' || r.status === 'declined';
+  const isOffer = r.status === 'offer';
+  const isActive = !isEnd && !isOffer;
+  return `
+  <div class="card" data-id="${r.id}" style="--st:${st.color};--av:${st.av}">
+    <div class="row1">
+      <div class="avatar">${esc(initials(r.company))}</div>
+      <div class="main">
+        <div class="company"><span class="name">${esc(r.company)}</span><span class="badge" style="background:${st.color}">${st.label}</span></div>
+        <div class="position">
+          ${r.position ? `<span>${esc(r.position)}</span>` : ''}
+          ${r.city ? `<span class="sep">·</span><span>📍${esc(r.city)}</span>` : ''}
+          ${r.salary ? `<span class="sep">·</span><span>💰${esc(r.salary)}</span>` : ''}
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      ${r.link ? `<a class="item" href="${escAttr(r.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🔗 岗位链接</a>` : ''}
+      ${nextHTML}
+      ${undone ? `<span class="item">📌 ${undone} 项待办</span>` : ''}
+    </div>
+    ${todosHTML}
+    <div class="actions">
+      ${isActive ? `<button class="btn primary" data-act="advance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>${nextBtnLabel(r.status)}</button><button class="btn danger" data-act="reject">未通过</button>` : ''}
+      ${isOffer ? `<button class="btn danger" data-act="decline">拒Offer</button>` : ''}
+      <button class="btn ghost" data-act="edit">编辑</button>
+      ${isEnd ? `<button class="btn danger" data-act="delete">删除</button>` : ''}
+    </div>
+  </div>`;
+}
+function nextBtnLabel(st) {
+  if (st === 'submitted') return '进入筛选';
+  if (st === 'screening') return '进入一面';
+  if (st === 'interview1') return '进入二面';
+  if (st === 'interview2') return '进入三面';
+  if (st === 'interview3') return '进入HR面';
+  if (st === 'hr') return '标记 Offer';
+  return '推进进度';
+}
+function advanceStatus(id) {
+  const r = records.find(x => x.id === id);
+  if (!r) return;
+  const i = STATUS_ORDER.indexOf(r.status);
+  if (i < 0 || i >= STATUS_ORDER.length - 2) return;
+  r.status = STATUS_ORDER[i + 1];
+  r.updatedAt = Date.now();
+  save(); renderAll();
+  toast(`已推进到「${STATUS[r.status].label}」`);
+}
+function rejectRecord(id) {
+  const r = records.find(x => x.id === id);
+  if (!r) return;
+  confirmBox('标记为「被拒」？', `「${r.company}」${r.position ? ' · ' + r.position : ''}将被标记为未通过（简历或面试）。记录会保留，可随时在编辑中恢复为其他进度。`, () => {
+    r.status = 'rejected';
+    r.updatedAt = Date.now();
+    save(); renderAll();
+    toast('已标记为「被拒」');
+  });
+}
+function declineOffer(id) {
+  const r = records.find(x => x.id === id);
+  if (!r) return;
+  confirmBox('标记为「拒Offer」？', `确认已拒绝「${r.company}」的 Offer 吗？记录会保留，可随时在编辑中恢复。`, () => {
+    r.status = 'declined';
+    r.updatedAt = Date.now();
+    save(); renderAll();
+    toast('已标记为「拒Offer」');
+  });
+}
+
+/* ================= 编辑器 ================= */
+function fillStatusSelect() {
+  const sel = document.getElementById('fStatus');
+  sel.innerHTML = STATUS_ORDER.map(k => `<option value="${k}">${STATUS[k].label}</option>`).join('');
+}
+function openEditor(id) {
+  editingId = id || null;
+  const r = id ? records.find(x => x.id === id) : null;
+  document.getElementById('editorTitle').firstChild.textContent = r ? '编辑面试记录 ' : '新增面试记录 ';
+  document.getElementById('fCompany').value = r ? r.company : '';
+  document.getElementById('fPosition').value = r ? r.position : '';
+  document.getElementById('fCity').value = r ? r.city : '';
+  document.getElementById('fSalary').value = r ? r.salary : '';
+  document.getElementById('fLink').value = r ? r.link : '';
+  document.getElementById('fStatus').value = r ? r.status : 'submitted';
+  document.getElementById('fDate').value = r ? r.nextDate : '';
+  document.getElementById('fTime').value = r ? r.nextTime : '';
+  document.getElementById('fNotes').value = r ? r.notes : '';
+  renderTodoEditor(r ? r.todos || [] : []);
+  document.getElementById('btnDelete').style.display = r ? 'block' : 'none';
+  document.getElementById('editorMask').classList.add('show');
+  setTimeout(() => document.getElementById('fCompany').focus(), 250);
+}
+function closeEditor() { document.getElementById('editorMask').classList.remove('show'); editingId = null; }
+
+let todoDraft = [];
+function renderTodoEditor(todos) {
+  todoDraft = todos.map(t => ({ id: t.id || uid(), text: t.text, done: !!t.done }));
+  const box = document.getElementById('todoList');
+  box.innerHTML = todoDraft.map(t => `
+    <div class="todo-item" data-id="${t.id}">
+      <div class="tcheck ${t.done ? 'checked' : ''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <input type="text" value="${esc(t.text)}" placeholder="准备自我介绍…">
+      <button class="tdel">✕</button>
+    </div>`).join('');
+  box.querySelectorAll('.todo-item').forEach(item => {
+    const id = item.dataset.id;
+    const inp = item.querySelector('input');
+    item.querySelector('.tcheck').onclick = () => {
+      const t = todoDraft.find(x => x.id === id);
+      t.done = !t.done;
+      item.querySelector('.tcheck').classList.toggle('checked', t.done);
+      inp.classList.toggle('done', t.done);
+    };
+    inp.oninput = () => { const t = todoDraft.find(x => x.id === id); t.text = inp.value; };
+    item.querySelector('.tdel').onclick = () => {
+      todoDraft = todoDraft.filter(x => x.id !== id);
+      item.remove();
+    };
+  });
+}
+function addTodo() {
+  const t = { id: uid(), text: '', done: false };
+  todoDraft.push(t);
+  const box = document.getElementById('todoList');
+  const div = document.createElement('div');
+  div.className = 'todo-item'; div.dataset.id = t.id;
+  div.innerHTML = `<div class="tcheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+    <input type="text" placeholder="准备自我介绍…"><button class="tdel">✕</button>`;
+  box.appendChild(div);
+  const inp = div.querySelector('input');
+  div.querySelector('.tcheck').onclick = () => { t.done = !t.done; div.querySelector('.tcheck').classList.toggle('checked', t.done); inp.classList.toggle('done', t.done); };
+  inp.oninput = () => { t.text = inp.value; };
+  div.querySelector('.tdel').onclick = () => { todoDraft = todoDraft.filter(x => x.id !== t.id); div.remove(); };
+  inp.focus();
+}
+function saveEditor() {
+  const company = document.getElementById('fCompany').value.trim();
+  if (!company) { toast('请填写公司名称'); document.getElementById('fCompany').focus(); return; }
+  const todos = todoDraft.filter(t => t.text.trim()).map(t => ({ id: t.id, text: t.text.trim(), done: t.done }));
+  const data = {
+    company,
+    position: document.getElementById('fPosition').value.trim(),
+    city: document.getElementById('fCity').value.trim(),
+    salary: document.getElementById('fSalary').value.trim(),
+    link: document.getElementById('fLink').value.trim(),
+    status: document.getElementById('fStatus').value,
+    nextDate: document.getElementById('fDate').value,
+    nextTime: document.getElementById('fTime').value,
+    notes: document.getElementById('fNotes').value.trim(),
+    todos,
+  };
+  if (editingId) {
+    const r = records.find(x => x.id === editingId);
+    Object.assign(r, data, { updatedAt: Date.now() });
+    toast('已保存修改');
+  } else {
+    records.unshift(Object.assign({ id: uid(), createdAt: Date.now(), updatedAt: Date.now() }, data));
+    toast('已添加 ' + company);
+  }
+  save(); closeEditor(); renderAll();
+  maybeNotify();
+}
+function confirmDelete(id) {
+  const r = records.find(x => x.id === id);
+  if (!r) return;
+  confirmBox('删除这条记录？', `将删除「${r.company}」${r.position ? ' · ' + r.position : ''}的全部信息，无法恢复。`, () => {
+    records = records.filter(x => x.id !== id);
+    save(); renderAll(); closeEditor();
+    toast('已删除');
+  });
+}
+
+/* ================= 通用渲染 ================= */
+function renderAll() {
+  renderStats(); renderReminder(); renderChips(); renderList();
+}
+
+/* ================= 导出 / 备份 ================= */
+function download(filename, content, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 300);
+}
+function exportCSV() {
+  const head = ['公司名称', '职位', '城市', '薪资范围', '当前进度', '下次面试日期', '面试时间', '待办事项', '备注', '岗位链接', '创建时间'];
+  const rows = records.map(r => [
+    r.company, r.position, r.city, r.salary, STATUS[r.status].label,
+    r.nextDate || '', r.nextTime || '',
+    (r.todos || []).map(t => (t.done ? '[已完成]' : '') + t.text).join('；'),
+    r.notes, r.link,
+    new Date(r.createdAt || Date.now()).toLocaleString('zh-CN'),
+  ]);
+  const csv = '\ufeff' + [head, ...rows].map(row => row.map(v => {
+    v = String(v == null ? '' : v);
+    return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+  }).join(',')).join('\r\n');
+  download('求职录_' + todayStr() + '.csv', csv, 'text/csv;charset=utf-8');
+  toast('已导出 CSV，可用 Excel 打开');
+}
+function exportJSON() {
+  download('求职录备份_' + todayStr() + '.json', JSON.stringify({ app: '求职录', version: 1, exportedAt: new Date().toISOString(), records }, null, 2), 'application/json');
+  toast('已导出 JSON 备份');
+}
+function importJSON(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      const arr = Array.isArray(data) ? data : (data.records || []);
+      if (!arr.length) { toast('备份中没有数据'); return; }
+      confirmBox('导入 ' + arr.length + ' 条记录？', '导入后将与当前数据合并（按记录 ID 去重），现有数据保留。', () => {
+        const ids = new Set(records.map(r => r.id));
+        arr.forEach(r => { if (r && r.company && !ids.has(r.id)) { records.push(r); ids.add(r.id); } });
+        save(); renderAll();
+        toast('已导入 ' + records.length + ' 条记录');
+      });
+    } catch (e) { toast('文件解析失败，请确认是备份 JSON 文件'); }
+  };
+  reader.readAsText(file);
+}
+
+/* ================= 通知 ================= */
+function maybeNotify() {
+  const upcoming = records.filter(r => r.nextDate === todayStr() && !['offer', 'rejected', 'declined'].includes(r.status));
+  if (!upcoming.length) return;
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') {
+    const r = upcoming[0];
+    new Notification('今日面试提醒', { body: `${r.company} · ${r.position || '面试'} ${r.nextTime ? r.nextTime : '今天'}`, icon: 'icons/icon-192.png' });
+  }
+}
+
+/* ================= Toast / Confirm ================= */
+let toastTimer = null;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+let cfCallback = null;
+function confirmBox(title, text, ok) {
+  document.getElementById('cfTitle').textContent = title;
+  document.getElementById('cfText').textContent = text;
+  cfCallback = ok;
+  document.getElementById('confirmMask').classList.add('show');
+}
+function closeConfirm() { document.getElementById('confirmMask').classList.remove('show'); cfCallback = null; }
+
+/* ================= 工具 ================= */
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function escAttr(s) { return esc(s).replace(/&quot;/g, '"'); }
+function initials(name) {
+  name = String(name || '').trim();
+  if (!name) return '?';
+  if (/^[\u4e00-\u9fa5]/.test(name)) return name.slice(0, 2);
+  const parts = name.split(/[\s._-]+/).filter(Boolean);
+  return parts.length > 1 ? (parts[0][0] + parts[1][0]).toUpperCase() : name.slice(0, 2).toUpperCase();
+}
+
+/* ================= 事件绑定 ================= */
+document.getElementById('btnAdd').onclick = () => openEditor(null);
+document.getElementById('editorClose').onclick = closeEditor;
+document.getElementById('editorMask').onclick = (e) => { if (e.target.id === 'editorMask') closeEditor(); };
+document.getElementById('btnSave').onclick = saveEditor;
+document.getElementById('btnDelete').onclick = () => { if (editingId) confirmDelete(editingId); };
+document.getElementById('btnAddTodo').onclick = addTodo;
+document.getElementById('btnExport').onclick = () => document.getElementById('exportMenu').classList.add('show');
+document.getElementById('exportMask').onclick = () => document.getElementById('exportMenu').classList.remove('show');
+document.getElementById('optCsv').onclick = () => { document.getElementById('exportMenu').classList.remove('show'); exportCSV(); };
+document.getElementById('optJson').onclick = () => { document.getElementById('exportMenu').classList.remove('show'); exportJSON(); };
+document.getElementById('optImport').onclick = () => { document.getElementById('exportMenu').classList.remove('show'); document.getElementById('fileImport').click(); };
+document.getElementById('fileImport').onchange = (e) => { if (e.target.files[0]) importJSON(e.target.files[0]); e.target.value = ''; };
+document.getElementById('optClear').onclick = () => {
+  document.getElementById('exportMenu').classList.remove('show');
+  confirmBox('清空全部数据？', '将删除本机上的所有面试记录，此操作不可恢复。建议先导出备份。', () => {
+    records = []; save(); renderAll();
+    toast('已清空全部数据');
+  });
+};
+document.getElementById('cfOk').onclick = () => { const cb = cfCallback; closeConfirm(); if (cb) cb(); };
+document.getElementById('cfCancel').onclick = closeConfirm;
+
+/* ================= 启动 ================= */
+fillStatusSelect();
+load();
+renderAll();
+
+/* PWA：Service Worker 注册 */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+/* 添加到主屏幕提示：仅当独立模式未启用时，短暂显示（3.5 秒后自动收起） */
+if (!window.matchMedia('(display-mode: standalone)').matches && !navigator.standalone) {
+  const hint = document.getElementById('installHint');
+  hint.classList.add('show');
+  setTimeout(() => hint.classList.remove('show'), 6000);
+}
+/* 请求通知权限（用户点击添加记录后更容易接受，这里静默申请一次） */
+if ('Notification' in window && Notification.permission === 'default') {
+  setTimeout(() => Notification.requestPermission().catch(() => {}), 3000);
+}
+</script>
+</body>
+</html>
