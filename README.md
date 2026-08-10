@@ -26,7 +26,7 @@
 
 ## 应用目录
 
-访问入口：`https://lexplain.github.io/Tools/`（自动展示所有应用列表）
+访问入口：`https://iexplain.github.io/Tools/`（自动展示所有应用列表）
 
 这个入口页本身也是一个 PWA，可以单独「添加到主屏幕」，点一下就能进任意子应用。
 
@@ -87,7 +87,7 @@
 3. **Source** 选 `Deploy from a branch`
 4. **Branch** 选 `main`、**文件夹**选 `/` (root) → 点 **Save**
 5. 等 1~2 分钟，刷新页面，GitHub 会显示绿色横幅 **"Your site is live at ..."**，并给出链接
-6. 这个链接就是部署地址，格式如：`https://lexplain.github.io/Tools/qiuzhilu/`
+6. 这个链接就是部署地址，格式如：`https://iexplain.github.io/Tools/qiuzhilu/`
 7. 用 iPhone Safari 打开这个完整链接 → 点分享 → **添加到主屏幕**，就搞定啦
 
 ## 如何添加新应用（重点）
