@@ -742,7 +742,7 @@ function renderDonut(type) {
     segs.push(`<circle cx="60" cy="60" r="${R}" fill="none" stroke="${it.cat.color}" stroke-width="14"
       stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}"
       stroke-dashoffset="${offset.toFixed(2)}" transform="rotate(-90 60 60)" />`);
-  }).join('');
+  });
 
   const top = items.slice(0, 5);
   const legend = top.map(it => `
@@ -758,7 +758,7 @@ function renderDonut(type) {
     <div class="donut-wrap">
       <svg class="donut-svg" viewBox="0 0 120 120">
         <circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--gray-light)" stroke-width="14" />
-        ${segs}
+        ${segs.join('')}
         <text x="60" y="56" text-anchor="middle" font-size="13" font-weight="800" fill="var(--ink)">${fmtMoney(total)}</text>
         <text x="60" y="74" text-anchor="middle" font-size="10" fill="var(--gray)">${type === 'expense' ? '支出' : '收入'}</text>
       </svg>
