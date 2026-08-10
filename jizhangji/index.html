@@ -1122,6 +1122,14 @@ function download(filename, content, mime) {
   a.click();
   setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 300);
 }
+/* CSV 单元格转义。除了常规的引号/换行处理，还要给 = + - @ 开头的内容加前导单引号，
+   否则 Excel / Numbers 会把它当公式执行（备注里写「=1+1」或恶意内容都会中招）。
+   纯数字（如 -128.00）不加，避免把合法的支出金额变成文本。 */
+function csvCell(v) {
+  v = String(v == null ? '' : v);
+  if (/^[=+\-@\t\r]/.test(v) && !/^[-+]?\d+(\.\d+)?$/.test(v)) v = "'" + v;
+  return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+}
 function exportCSV() {
   const head = ['日期', '时间', '类型', '分类', '金额', '备注'];
   const rows = records.slice().sort((a, b) => (a.date || '').localeCompare(b.date || ''))
@@ -1133,10 +1141,7 @@ function exportCSV() {
       (r.type === 'expense' ? '-' : '+') + Number(r.amount).toFixed(2),
       r.note || ''
     ]);
-  const csv = '﻿' + [head, ...rows].map(row => row.map(v => {
-    v = String(v == null ? '' : v);
-    return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
-  }).join(',')).join('\r\n');
+  const csv = '﻿' + [head, ...rows].map(row => row.map(csvCell).join(',')).join('\r\n');
   download('记账本_' + todayStr() + '.csv', csv, 'text/csv;charset=utf-8');
   toast('已导出 CSV，可用 Excel 打开');
 }
