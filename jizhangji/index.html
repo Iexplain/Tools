@@ -568,8 +568,7 @@
   /* ===== 适配 Tab 栏：FAB 上移、页面留白 ===== */
   .fab { bottom: calc(84px + var(--safe-bottom)); }
   .app { padding-bottom: calc(150px + var(--safe-bottom)); }
-  /* ===== 环形图提示与图例联动 ===== */
-  .donut-tip { margin-top: 10px; font-size: 11px; color: var(--ink-2); text-align: center; }
+  /* ===== 环形图图例联动 ===== */
   .donut-legend .lg-item { cursor: pointer; border-radius: 8px; padding: 2px 6px; margin: 0 -6px; transition: background .15s; }
   .donut-legend .lg-item.act { background: var(--primary-light); }
   .donut-legend .lg-item:active { background: var(--gray-light); }
@@ -582,30 +581,6 @@
   .donut-seg.act {
     filter: drop-shadow(0 4px 8px rgba(0,0,0,.35));
     stroke-width: 16;
-  }
-
-  /* Tooltip 气泡（嵌入在 SVG 内，用 viewBox 坐标定位） */
-  .donut-tip {
-    position: absolute;
-    background: rgba(31, 41, 55, .92);
-    color: #fff; padding: 6px 9px; border-radius: 9px;
-    font-size: 11px; line-height: 1.45;
-    white-space: nowrap;
-    transform: translate(-50%, -100%);
-    pointer-events: none;
-    z-index: 5;
-    animation: tipPop .25s ease;
-    box-shadow: 0 6px 14px rgba(0,0,0,.25), 0 0 0 2px var(--seg-glow, rgba(0,0,0,.35));
-  }
-  @keyframes tipPop { from { opacity: 0; transform: translate(-50%, -90%); } to { opacity: 1; transform: translate(-50%, -100%); } }
-  .donut-tip .tip-name { font-weight: 700; font-size: 12px; margin-bottom: 2px; }
-  .donut-tip .tip-amt { font-weight: 800; color: #FFD66B; font-variant-numeric: tabular-nums; }
-  .donut-tip .tip-count { font-size: 10px; opacity: .75; margin-top: 1px; }
-  /* 小三角（朝下指向扇区） */
-  .donut-tip::after {
-    content: ''; position: absolute;
-    bottom: -5px; left: 50%; transform: translateX(-50%);
-    border: 5px solid transparent; border-top-color: rgba(31, 41, 55, .92);
   }
 
   /* ===== 消费排行榜 ===== */
@@ -1103,35 +1078,11 @@ function renderDonut(type) {
   // 中心文字
   const centerSub = activeSeg ? activeSeg.cat.label : (type === 'expense' ? '支出' : '收入');
 
-  // Tooltip（选中时显示在扇区旁边，SVG 内 foreignObject 用 viewBox 坐标定位）
-  let tooltipHTML = '';
-  if (activeSeg) {
-    // 扇区外凸后中点 viewBox 坐标（R+8 = 56 处）
-    const mx = 60 + 56 * Math.cos(activeSeg.angle);
-    const my = 60 + 56 * Math.sin(activeSeg.angle);
-    // tooltip 出现在扇区中点再往外 6px 处；按 viewBox 0-120 边界夹紧
-    const tx = Math.max(20, Math.min(100, mx + 6 * Math.cos(activeSeg.angle)));
-    const ty = Math.max(20, Math.min(100, my + 6 * Math.sin(activeSeg.angle)));
-    // 三角小箭头朝向：根据扇区位置决定提示框朝向（左/右）
-    const isLeftHalf = activeSeg.angle < Math.PI / 2 && activeSeg.angle > -Math.PI / 2;
-    const cls = isLeftHalf ? 'tip-right' : 'tip-left';
-    tooltipHTML = `
-      <foreignObject x="0" y="0" width="120" height="120" style="pointer-events:none;overflow:visible">
-        <div xmlns="http://www.w3.org/1999/xhtml" class="donut-tip ${cls}" 
-             style="left:${tx.toFixed(1)}px;top:${ty.toFixed(1)}px;--seg-glow:${activeSeg.cat.color}">
-          <div class="tip-name">${activeSeg.cat.icon} ${esc(activeSeg.cat.label)}</div>
-          <div class="tip-amt">${fmtMoney(activeSeg.amt)} · ${Math.round(activeSeg.pct * 100)}%</div>
-          <div class="tip-count">${activeSeg.count} 笔</div>
-        </div>
-      </foreignObject>`;
-  }
-
   return `
     <div class="donut-wrap">
       <svg class="donut-svg" viewBox="0 0 120 120">
         <circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--gray-light)" stroke-width="14" />
         ${segs.join('')}
-        ${tooltipHTML}
         <circle cx="60" cy="60" r="30" fill="transparent" class="donut-center" style="cursor:pointer" />
         <text x="60" y="55" text-anchor="middle" font-size="11" font-weight="800" fill="var(--ink)">${fmtMoney(activeSeg ? activeSeg.amt : total)}</text>
         <text x="60" y="72" text-anchor="middle" font-size="9" fill="var(--gray)">${activeSeg ? '已筛选·' + esc(centerSub) : esc(centerSub)}</text>
