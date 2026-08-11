@@ -542,6 +542,39 @@
   .card .amount, .donut-legend .lg-amt, .summary-item .amt, .trend-tip b, .card .meta .date, .day-group .right {
     font-variant-numeric: tabular-nums;
   }
+
+  /* ===== 页面切换 ===== */
+  .page { display: none; }
+  .page.show { display: block; }
+
+  /* ===== 底部 Tab 栏 ===== */
+  .tabbar {
+    position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: 0; width: 100%; max-width: 480px;
+    background: var(--glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border-top: 1px solid var(--glass-border);
+    display: flex; z-index: 60;
+    padding: 6px 12px calc(6px + var(--safe-bottom));
+  }
+  .tab-btn {
+    flex: 1; border: none; background: transparent; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 6px 0; color: var(--ink-2); font-family: inherit;
+    transition: color .15s, transform .12s;
+  }
+  .tab-btn svg { width: 22px; height: 22px; }
+  .tab-btn span { font-size: 11px; font-weight: 700; }
+  .tab-btn.active { color: var(--primary); }
+  .tab-btn:active { transform: scale(.93); }
+  .tab-btn .tab-dot {
+    width: 16px; height: 3px; border-radius: 2px; background: var(--primary);
+    opacity: 0; transition: opacity .15s;
+  }
+  .tab-btn.active .tab-dot { opacity: 1; }
+
+  /* ===== 适配 Tab 栏：FAB 上移、页面留白 ===== */
+  .fab { bottom: calc(84px + var(--safe-bottom)); }
+  .app { padding-bottom: calc(150px + var(--safe-bottom)); }
 </style>
 </head>
 <body>
@@ -566,49 +599,80 @@
     💡 <b>小提示：</b>点击 Safari 底部的<b>分享按钮</b>，选择<b>「添加到主屏幕」</b>，即可像 App 一样全屏使用，还能离线打开。
   </div>
 
-  <div class="month-switcher">
-    <button id="prevMonth" aria-label="上个月">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-    </button>
-    <div class="current" id="currentMonth"></div>
-    <button id="nextMonth" aria-label="下个月">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-    </button>
+  <!-- 页面一：记账明细 -->
+  <div class="page show" id="pageMain">
+    <div class="month-switcher">
+      <button id="prevMonth1" aria-label="上个月">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="current" id="currentMonth1"></div>
+      <button id="nextMonth1" aria-label="下个月">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card"><div class="num income" id="stIncome">¥0</div><div class="lbl">本月收入</div></div>
+      <div class="stat-card"><div class="num expense" id="stExpense">¥0</div><div class="lbl">本月支出</div></div>
+      <div class="stat-card"><div class="num balance" id="stBalance">¥0</div><div class="lbl">本月结余</div></div>
+    </div>
+
+    <div id="summaryBox"></div>
+
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="搜索备注、分类、金额…" autocomplete="off">
+      <button class="clear" id="searchClear" aria-label="清除">✕</button>
+    </div>
+    <div class="range-row" id="rangeRow">
+      <input type="date" id="dateFrom" aria-label="开始日期">
+      <span>至</span>
+      <input type="date" id="dateTo" aria-label="结束日期">
+    </div>
+
+    <div class="chips" id="chips"></div>
+
+    <div class="section-title">
+      <h2 id="listTitle">本月明细</h2>
+      <span class="count" id="listCount">0 笔</span>
+    </div>
+
+    <div id="list"></div>
   </div>
 
-  <div class="stats">
-    <div class="stat-card"><div class="num income" id="stIncome">¥0</div><div class="lbl">本月收入</div></div>
-    <div class="stat-card"><div class="num expense" id="stExpense">¥0</div><div class="lbl">本月支出</div></div>
-    <div class="stat-card"><div class="num balance" id="stBalance">¥0</div><div class="lbl">本月结余</div></div>
+  <!-- 页面二：统计图表 -->
+  <div class="page" id="pageStats">
+    <div class="month-switcher">
+      <button id="prevMonth2" aria-label="上个月">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="current" id="currentMonth2"></div>
+      <button id="nextMonth2" aria-label="下个月">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    <div id="chartBox"></div>
   </div>
-
-  <div id="chartBox"></div>
-  <div id="summaryBox"></div>
-
-  <div class="search-bar">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-    <input type="text" id="searchInput" placeholder="搜索备注、分类、金额…" autocomplete="off">
-    <button class="clear" id="searchClear" aria-label="清除">✕</button>
-  </div>
-  <div class="range-row" id="rangeRow">
-    <input type="date" id="dateFrom" aria-label="开始日期">
-    <span>至</span>
-    <input type="date" id="dateTo" aria-label="结束日期">
-  </div>
-
-  <div class="chips" id="chips"></div>
-
-  <div class="section-title">
-    <h2 id="listTitle">本月明细</h2>
-    <span class="count" id="listCount">0 笔</span>
-  </div>
-
-  <div id="list"></div>
 </div>
 
 <button class="fab" id="btnAdd" aria-label="新增一笔账">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
 </button>
+
+<!-- 底部 Tab 导航 -->
+<nav class="tabbar" id="tabbar">
+  <button class="tab-btn active" data-tab="main">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>
+    <span>明细</span>
+    <span class="tab-dot"></span>
+  </button>
+  <button class="tab-btn" data-tab="stats">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+    <span>统计</span>
+    <span class="tab-dot"></span>
+  </button>
+</nav>
 
 <!-- Editor modal -->
 <div class="modal-mask" id="editorMask">
@@ -785,6 +849,7 @@ let editCat = '';          // 编辑器中的当前分类
 let searchQ = '';          // 搜索关键字
 let dateFrom = '';         // 日期范围起
 let dateTo = '';           // 日期范围止
+let currentTab = 'main';   // 底部 Tab：main 明细 / stats 统计
 const MEM_KEY = 'accountBook.lastCat.v1';  // 记住上次选择的类型+分类
 const GH_KEY = 'accountBook.gh.v1';        // GitHub 同步配置
 
@@ -837,13 +902,29 @@ function save() {
 
 /* ================= 月份切换 ================= */
 function renderMonth() {
-  const el = document.getElementById('currentMonth');
   const isNow = viewMonth === nowMonth();
-  el.textContent = monthLabel(viewMonth) + (isNow ? '' : '  ›');
-  el.classList.toggle('no-month', !isNow);
-  el.title = isNow ? '当前月' : '点击回到本月';
-  document.getElementById('nextMonth').disabled = isNow;
-  document.getElementById('nextMonth').style.opacity = isNow ? .35 : 1;
+  ['currentMonth1', 'currentMonth2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = monthLabel(viewMonth) + (isNow ? '' : '  ›');
+    el.classList.toggle('no-month', !isNow);
+  });
+  ['nextMonth1', 'nextMonth2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.disabled = isNow; el.style.opacity = isNow ? .35 : 1; }
+  });
+}
+
+/* ================= 底部 Tab 切换 ================= */
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('pageMain').classList.toggle('show', tab === 'main');
+  document.getElementById('pageStats').classList.toggle('show', tab === 'stats');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  const fab = document.getElementById('btnAdd');
+  fab.style.display = tab === 'main' ? 'flex' : 'none';
+  if (tab === 'stats') renderCharts();
+  if (tab === 'main') { renderSummary(); renderChips(); renderList(); }
 }
 
 /* ================= 统计 ================= */
@@ -1561,15 +1642,21 @@ document.getElementById('githubMask').onclick = (e) => { if (e.target.id === 'gi
 document.getElementById('ghUpload').onclick = ghUpload;
 document.getElementById('ghDownload').onclick = ghDownload;
 
-// 月份切换
-document.getElementById('prevMonth').onclick = () => { viewMonth = shiftMonth(viewMonth, -1); renderAll(); };
-document.getElementById('nextMonth').onclick = () => { viewMonth = shiftMonth(viewMonth, 1); renderAll(); };
-document.getElementById('currentMonth').onclick = () => { viewMonth = nowMonth(); renderAll(); };
+// 月份切换（明细页 + 统计页各一套）
+[['prevMonth1', 'nextMonth1', 'currentMonth1'], ['prevMonth2', 'nextMonth2', 'currentMonth2']].forEach(ids => {
+  document.getElementById(ids[0]).onclick = () => { viewMonth = shiftMonth(viewMonth, -1); renderAll(); };
+  document.getElementById(ids[1]).onclick = () => { viewMonth = shiftMonth(viewMonth, 1); renderAll(); };
+  document.getElementById(ids[2]).onclick = () => { viewMonth = nowMonth(); renderAll(); };
+});
+
+// 底部 Tab 切换
+document.querySelectorAll('.tab-btn').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
 
 /* ================= 启动 ================= */
 viewMonth = nowMonth();
 load();
 renderAll();
+switchTab('main');
 
 /* PWA：Service Worker 注册 */
 if ('serviceWorker' in navigator) {
