@@ -130,17 +130,23 @@
 
   /* ===== Stats ===== */
   .stats {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
     margin-bottom: 14px;
   }
   .stat-card {
     background: var(--glass); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--glass-border);
-    border-radius: 16px; padding: 12px 6px;
+    border-radius: 16px; padding: 12px 4px;
     text-align: center; box-shadow: var(--shadow);
+    min-width: 0;
   }
-  .stat-card .num { font-size: 18px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
-  .stat-card .lbl { font-size: 11px; color: var(--ink-2); margin-top: 3px; }
+  /* 金额必须单行不换行：符号+数字同行；字号随屏宽自适应（clamp），溢出自动收窄 */
+  .stat-card .num {
+    font-size: clamp(12px, 3.9vw, 17px); font-weight: 800; line-height: 1.2;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+    overflow: hidden; text-overflow: clip;
+  }
+  .stat-card .lbl { font-size: 11px; color: var(--ink-2); margin-top: 3px; white-space: nowrap; }
   .stat-card .num.income { color: var(--income-dark); }
   .stat-card .num.expense { color: var(--primary); }
   .stat-card .num.balance { color: var(--ink); }
