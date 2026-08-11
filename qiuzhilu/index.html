@@ -1259,7 +1259,14 @@ function exportICS(dateStr) {
     'END:VCALENDAR'
   ].join('\r\n');
   download('面试_' + dateStr + '.ics', lines, 'text/calendar;charset=utf-8');
-  toast('已导出 ' + evs.length + ' 个日历事件，用「日历」App 打开即可添加');
+  // iOS PWA / 安卓 的明确操作指引
+  const isIOSPWA = window.navigator.standalone === true;
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  if (isIOSPWA || isIOS) {
+    toast('已下载 .ics：去「文件」App → 找到文件 → 选「日历」打开');
+  } else {
+    toast('已下载 .ics 文件，双击或用日历 App 打开即可');
+  }
 }
 
 /* ================= Offer 对比 ================= */
@@ -1309,13 +1316,14 @@ function closeStMenu() { document.getElementById('stMenuMask').classList.remove(
 
 /* ================= 导出 / 备份 ================= */
 function download(filename, content, mime) {
-  const blob = new Blob([content], { type: mime });
-  const url = URL.createObjectURL(blob);
+  // 用 data URL 而非 Blob URL，兼容 iOS PWA standalone 模式（iOS WebKit 会阻止 Blob 下载）
   const a = document.createElement('a');
-  a.href = url; a.download = filename;
+  a.href = 'data:' + mime + ',' + encodeURIComponent(content);
+  a.download = filename;
+  a.rel = 'noopener';
   document.body.appendChild(a);
   a.click();
-  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 300);
+  setTimeout(() => a.remove(), 500);
 }
 /* CSV 单元格转义。除了常规的引号/换行处理，还要给 = + - @ 开头的内容加前导单引号，
    否则 Excel / Numbers 会把它当公式执行（备注里写「=1+1」或恶意内容都会中招）。
