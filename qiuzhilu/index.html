@@ -1216,12 +1216,8 @@ function renderCalendar() {
       }, 20);
     };
   });
-  list.querySelectorAll('.cal-day-list .item').forEach(it => {
-    it.onclick = () => openEditor(it.dataset.id);
-  });
-  list.querySelectorAll('.cal-ics').forEach(b => {
-    b.onclick = (e) => { e.stopPropagation(); exportICS(b.dataset.d); };
-  });
+  // 注意：.item 和 .cal-ics 是点击日期后动态生成的，不能在这里直接绑定，
+  // 统一由下面的「事件委托」在 list 容器上处理（见启动区）。
 }
 function shiftMonth(yyyymm, delta) {
   const [y, m] = yyyymm.split('-').map(Number);
@@ -1260,8 +1256,22 @@ function exportICS(dateStr) {
     }),
     'END:VCALENDAR'
   ].join('\r\n');
-  download('面试_' + dateStr + '.ics', lines, 'text/calendar;charset=utf-8');
-  // iOS PWA / 安卓 的明确操作指引
+  const ics = lines;
+  const filename = '面试_' + dateStr + '.ics';
+  // 优先 Web Share API：iOS/安卓会弹系统分享面板，选「日历」即可添加
+  if (navigator.canShare) {
+    try {
+      const file = new File([ics], filename, { type: 'text/calendar' });
+      if (navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: '面试安排' }).then(() => {
+          toast('已分享，在面板中选「日历」即可添加');
+        }).catch(() => { /* 用户取消分享，静默处理 */ });
+        return;
+      }
+    } catch (e) { /* 不支持则走下载 */ }
+  }
+  // 回退：data URL 下载
+  download(filename, ics, 'text/calendar;charset=utf-8');
   const isIOSPWA = window.navigator.standalone === true;
   const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
   if (isIOSPWA || isIOS) {
@@ -1439,6 +1449,14 @@ document.getElementById('cfCancel').onclick = closeConfirm;
 
 /* 视图切换 */
 document.querySelectorAll('.view-switch button').forEach(b => b.onclick = () => { viewMode = b.dataset.view; renderAll(); });
+
+/* 日历视图：动态生成的 .cal-ics / .item 用事件委托绑定（点击日期后才追加到 DOM，直接绑定会落空） */
+document.getElementById('list').addEventListener('click', (e) => {
+  const icsBtn = e.target.closest('.cal-ics');
+  if (icsBtn) { e.stopPropagation(); exportICS(icsBtn.dataset.d); return; }
+  const item = e.target.closest('.cal-day-list .item');
+  if (item) { e.stopPropagation(); openEditor(item.dataset.id); }
+});
 
 /* 状态快捷切换菜单 */
 document.getElementById('stMenuBg').onclick = closeStMenu;
