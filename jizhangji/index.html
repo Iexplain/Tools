@@ -574,6 +574,25 @@
   .donut-legend .lg-item.act { background: var(--primary-light); }
   .donut-legend .lg-item:active { background: var(--gray-light); }
 
+  /* 环形图切片：默认 + 过渡（rotate 移到 CSS，避免与 scale 冲突） */
+  .donut-seg {
+    transition: filter .3s ease, transform .3s ease, stroke-width .3s ease, opacity .3s ease;
+    transform-box: view-box; /* 保证 rotate/scale 以 viewBox 圆心(60,60)为基准，Safari 兼容 */
+    transform: rotate(-90deg);
+    transform-origin: 60px 60px;
+  }
+  /* 选中：霓虹发光（自身颜色）+ 浮起微放大 + 描边加粗 */
+  .donut-seg.act {
+    filter: drop-shadow(0 0 8px var(--seg-glow, rgba(0,0,0,.35)));
+    transform: rotate(-90deg) scale(1.06);
+    stroke-width: 16;
+  }
+  /* 弱化：去色（接近黑白灰）+ 轻微雾化模糊，保持明亮度 */
+  .donut-seg.dim {
+    filter: grayscale(80%) blur(1px);
+    opacity: .85;
+  }
+
   /* ===== 消费排行榜 ===== */
   .max-card { display: flex; align-items: center; gap: 12px; background: var(--surface-2); border-radius: 14px; padding: 14px; }
   .max-ic { width: 44px; height: 44px; border-radius: 13px; background: var(--st-bg); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
@@ -1026,11 +1045,13 @@ function renderDonut(type) {
     const len = C * p;
     const offset = -acc * C;
     acc += p;
-    const isActive = filter === it.key;
-    segs.push(`<circle cx="60" cy="60" r="${R}" fill="none" stroke="${isActive ? '#1F2937' : it.cat.color}" stroke-width="${isActive ? 16 : 14}"
+    // 选中：霓虹发光+浮起（act）；未选中且处于筛选态：去色+雾化（dim）
+    const segCls = filter === it.key ? 'act' : (filter !== 'all' ? 'dim' : '');
+    segs.push(`<circle cx="60" cy="60" r="${R}" fill="none" stroke="${it.cat.color}" stroke-width="14"
       stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}"
-      stroke-dashoffset="${offset.toFixed(2)}" transform="rotate(-90 60 60)"
-      class="donut-seg" data-key="${it.key}" style="cursor:pointer" />`);
+      stroke-dashoffset="${offset.toFixed(2)}"
+      class="donut-seg ${segCls}" data-key="${it.key}"
+      style="cursor:pointer;--seg-glow:${it.cat.color}" />`);
   });
 
   const top = items.slice(0, 5);
