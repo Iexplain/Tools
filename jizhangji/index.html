@@ -568,6 +568,24 @@
   /* ===== 适配 Tab 栏：FAB 上移、页面留白 ===== */
   .fab { bottom: calc(84px + var(--safe-bottom)); }
   .app { padding-bottom: calc(150px + var(--safe-bottom)); }
+  /* ===== 环形图提示与图例联动 ===== */
+  .donut-tip { margin-top: 10px; font-size: 11px; color: var(--ink-2); text-align: center; }
+  .donut-legend .lg-item { cursor: pointer; border-radius: 8px; padding: 2px 6px; margin: 0 -6px; transition: background .15s; }
+  .donut-legend .lg-item.act { background: var(--primary-light); }
+  .donut-legend .lg-item:active { background: var(--gray-light); }
+
+  /* ===== 消费排行榜 ===== */
+  .max-card { display: flex; align-items: center; gap: 12px; background: var(--surface-2); border-radius: 14px; padding: 14px; }
+  .max-ic { width: 44px; height: 44px; border-radius: 13px; background: var(--st-bg); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .max-amt { font-size: 20px; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; }
+  .max-meta { font-size: 12px; color: var(--ink-2); margin-top: 3px; }
+  .freq-item { display: flex; align-items: center; gap: 10px; padding: 9px 4px; border-radius: 12px; cursor: pointer; transition: background .15s; }
+  .freq-item:active { background: var(--gray-light); }
+  .freq-rank { width: 20px; height: 20px; border-radius: 50%; background: var(--gray-light); color: var(--ink-2); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .freq-rank.gold { background: #FFC53D; color: #fff; }
+  .freq-ic { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .freq-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .freq-desc { margin-left: auto; font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -610,7 +628,7 @@
       <div class="stat-card"><div class="num balance" id="stBalance">¥0</div><div class="lbl">本月结余</div></div>
     </div>
 
-    <div id="summaryBox"></div>
+    <div id="donutBox"></div>
 
     <div class="search-bar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -643,7 +661,8 @@
       </button>
     </div>
 
-    <div id="chartBox"></div>
+    <div id="rankingBox"></div>
+    <div id="trendBox"></div>
   </div>
 </div>
 
@@ -914,8 +933,8 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   const fab = document.getElementById('btnAdd');
   fab.style.display = tab === 'main' ? 'flex' : 'none';
-  if (tab === 'stats') renderCharts();
-  if (tab === 'main') { renderSummary(); renderList(); }
+  if (tab === 'stats') { renderRanking(); renderTrendCard(); }
+  if (tab === 'main') { renderDonutCard(); renderList(); }
 }
 
 /* ================= 统计 ================= */
@@ -938,19 +957,16 @@ function renderStats() {
   document.getElementById('stBalance').textContent = (s.balance >= 0 ? '+' : '') + fmtMoney(s.balance);
 }
 
-/* ================= 分类汇总 ================= */
-function renderCharts() {
-  const box = document.getElementById('chartBox');
+/* ================= 明细页：环形图（含联动） ================= */
+function renderDonutCard() {
+  const box = document.getElementById('donutBox');
   const list = monthRecords();
   const expList = list.filter(r => r.type === 'expense');
   const incList = list.filter(r => r.type === 'income');
-
   if (!expList.length && !incList.length) { box.innerHTML = ''; return; }
-
   // 自动选择有数据的 tab
   if (chartTab === 'expense' && !expList.length) chartTab = 'income';
   else if (chartTab === 'income' && !incList.length) chartTab = 'expense';
-
   box.innerHTML = `
     <div class="chart-card">
       <div class="ch-title">
@@ -961,18 +977,30 @@ function renderCharts() {
         </div>
       </div>
       ${renderDonut(chartTab)}
-    </div>
-    <div class="chart-card">
-      <div class="ch-title">
-        <h2>全年收支</h2>
-        <div class="legend-mini">
-          <span><span class="dot e"></span>支出</span>
-          <span><span class="dot i"></span>收入</span>
-        </div>
-      </div>
-      ${renderTrend()}
+      <div class="donut-tip">💡 点环形图切片筛选下方明细 · 再点一次或点中心还原</div>
     </div>`;
-  box.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { chartTab = b.dataset.tab; renderCharts(); });
+  box.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { chartTab = b.dataset.tab; renderDonutCard(); });
+  // 切片联动：点击筛选该分类，再点/点中心还原
+  box.querySelectorAll('.donut-seg').forEach(seg => {
+    seg.onclick = () => {
+      const k = seg.dataset.key;
+      filter = filter === k ? 'all' : k;
+      renderDonutCard();
+      renderList();
+    };
+  });
+  box.querySelectorAll('.donut-center').forEach(c => {
+    c.onclick = () => { filter = 'all'; renderDonutCard(); renderList(); };
+  });
+  // 图例行同样可点击联动
+  box.querySelectorAll('.lg-item').forEach(li => {
+    li.onclick = () => {
+      const k = li.dataset.key;
+      filter = filter === k ? 'all' : k;
+      renderDonutCard();
+      renderList();
+    };
+  });
 }
 
 function renderDonut(type) {
@@ -998,30 +1026,103 @@ function renderDonut(type) {
     const len = C * p;
     const offset = -acc * C;
     acc += p;
-    segs.push(`<circle cx="60" cy="60" r="${R}" fill="none" stroke="${it.cat.color}" stroke-width="14"
+    const isActive = filter === it.key;
+    segs.push(`<circle cx="60" cy="60" r="${R}" fill="none" stroke="${isActive ? '#1F2937' : it.cat.color}" stroke-width="${isActive ? 16 : 14}"
       stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}"
-      stroke-dashoffset="${offset.toFixed(2)}" transform="rotate(-90 60 60)" />`);
+      stroke-dashoffset="${offset.toFixed(2)}" transform="rotate(-90 60 60)"
+      class="donut-seg" data-key="${it.key}" style="cursor:pointer" />`);
   });
 
   const top = items.slice(0, 5);
-  const legend = top.map(it => `
-    <div class="lg-item">
+  const legend = top.map(it => {
+    const isActive = filter === it.key;
+    return `<div class="lg-item ${isActive ? 'act' : ''}" data-key="${it.key}">
       <span class="lg-dot" style="background:${it.cat.color}"></span>
       <span class="lg-name">${it.cat.icon} ${esc(it.cat.label)}</span>
       <span class="lg-amt">${fmtMoney(it.amt)}</span>
       <span class="lg-pct">${Math.round(it.pct * 100)}%</span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   const more = items.length > 5 ? `<div style="font-size:11px;color:var(--gray);margin-top:4px">+ ${items.length - 5} 个分类未显示</div>` : '';
+  // 中心文字：当前筛选分类时显示分类名
+  const activeCat = items.find(it => it.key === filter);
+  const centerSub = activeCat ? activeCat.cat.label : (type === 'expense' ? '支出' : '收入');
 
   return `
     <div class="donut-wrap">
       <svg class="donut-svg" viewBox="0 0 120 120">
         <circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--gray-light)" stroke-width="14" />
         ${segs.join('')}
-        <text x="60" y="56" text-anchor="middle" font-size="13" font-weight="800" fill="var(--ink)">${fmtMoney(total)}</text>
-        <text x="60" y="74" text-anchor="middle" font-size="10" fill="var(--gray)">${type === 'expense' ? '支出' : '收入'}</text>
+        <circle cx="60" cy="60" r="30" fill="transparent" class="donut-center" style="cursor:pointer" />
+        <text x="60" y="55" text-anchor="middle" font-size="11" font-weight="800" fill="var(--ink)">${fmtMoney(activeCat ? activeCat.amt : total)}</text>
+        <text x="60" y="72" text-anchor="middle" font-size="9" fill="var(--gray)">${activeCat ? '已筛选·' + esc(centerSub) : esc(centerSub)}</text>
       </svg>
       <div class="donut-legend">${legend}${more}</div>
+    </div>`;
+}
+
+/* ================= 统计页：消费极值 + 高频排行榜 ================= */
+function renderRanking() {
+  const box = document.getElementById('rankingBox');
+  const expList = monthRecords().filter(r => r.type === 'expense');
+  if (!expList.length) { box.innerHTML = ''; return; }
+  // 最大单笔
+  const maxR = expList.reduce((a, b) => (Number(b.amount) > Number(a.amount) ? b : a));
+  const maxCat = getCat('expense', maxR.category);
+  // 高频分类 Top3（次数 + 合计金额）
+  const freq = {}, amtSum = {};
+  expList.forEach(r => {
+    freq[r.category] = (freq[r.category] || 0) + 1;
+    amtSum[r.category] = (amtSum[r.category] || 0) + (Number(r.amount) || 0);
+  });
+  const top = Object.keys(freq).map(k => ({ k, count: freq[k], amt: amtSum[k] }))
+    .sort((a, b) => b.count - a.count).slice(0, 3);
+  box.innerHTML = `
+    <div class="chart-card">
+      <div class="ch-title"><h2>本月最大单笔支出</h2></div>
+      <div class="max-card" style="--st:${maxCat.color};--st-bg:${lighten(maxCat.color, .12)}">
+        <div class="max-ic">${maxCat.icon}</div>
+        <div class="max-main">
+          <div class="max-amt">${fmtMoney(maxR.amount)}</div>
+          <div class="max-meta">${esc(maxCat.label)}${maxR.note ? ' · ' + esc(maxR.note) : ''}${maxR.date ? ' · ' + esc(maxR.date) : ''}</div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="ch-title"><h2>高频消费 Top 3</h2></div>
+      ${top.map((t, i) => {
+        const c = getCat('expense', t.k);
+        return `<div class="freq-item" data-key="${t.k}">
+          <span class="freq-rank ${i === 0 ? 'gold' : ''}">${i + 1}</span>
+          <span class="freq-ic" style="background:${lighten(c.color, .15)}">${c.icon}</span>
+          <span class="freq-name">${esc(c.label)}</span>
+          <span class="freq-desc">${t.count} 次 · 共 ${fmtMoney(t.amt)}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  // 点击高频分类也可跳明细页筛选（切到明细 Tab）
+  box.querySelectorAll('.freq-item').forEach(item => {
+    item.onclick = () => {
+      filter = item.dataset.key;
+      switchTab('main');
+      renderList();
+    };
+  });
+}
+
+/* ================= 统计页：全年收支趋势 ================= */
+function renderTrendCard() {
+  const box = document.getElementById('trendBox');
+  box.innerHTML = `
+    <div class="chart-card">
+      <div class="ch-title">
+        <h2>全年收支</h2>
+        <div class="legend-mini">
+          <span><span class="dot e"></span>支出</span>
+          <span><span class="dot i"></span>收入</span>
+        </div>
+      </div>
+      ${renderTrend()}
     </div>`;
 }
 
@@ -1108,66 +1209,6 @@ function shortMoney(v) {
   if (v >= 1000) return (v / 1000).toFixed(0) + 'k';
   return Math.round(v).toString();
 }
-function renderSummary() {
-  const box = document.getElementById('summaryBox');
-  const list = monthRecords();
-  if (!list.length) { box.innerHTML = ''; return; }
-
-  // 支出和收入分别汇总
-  const sections = [];
-  const expList = list.filter(r => r.type === 'expense');
-  const incList = list.filter(r => r.type === 'income');
-
-  if (expList.length) {
-    const total = expList.reduce((s, r) => s + (Number(r.amount) || 0), 0);
-    const groups = {};
-    expList.forEach(r => { groups[r.category] = (groups[r.category] || 0) + (Number(r.amount) || 0); });
-    const items = Object.keys(groups).map(k => ({ key: k, amt: groups[k] }))
-      .sort((a, b) => b.amt - a.amt);
-    sections.push({ title: '支出分类', type: 'expense', items, total });
-  }
-  if (incList.length) {
-    const total = incList.reduce((s, r) => s + (Number(r.amount) || 0), 0);
-    const groups = {};
-    incList.forEach(r => { groups[r.category] = (groups[r.category] || 0) + (Number(r.amount) || 0); });
-    const items = Object.keys(groups).map(k => ({ key: k, amt: groups[k] }))
-      .sort((a, b) => b.amt - a.amt);
-    sections.push({ title: '收入分类', type: 'income', items, total });
-  }
-
-  box.innerHTML = sections.map(sec => {
-    const max = Math.max(...sec.items.map(it => it.amt));
-    const rows = sec.items.map(it => {
-      const cat = getCat(sec.type, it.key);
-      const pct = Math.round(it.amt / max * 100);
-      const percentOfTotal = sec.total > 0 ? Math.round(it.amt / sec.total * 100) : 0;
-      const act = filter === it.key ? ' act' : '';
-      return `<div class="summary-item${act}" data-key="${it.key}" style="--st:${cat.color};--st-bg:${lighten(cat.color, .12)}">
-        <div class="ic">${cat.icon}</div>
-        <div class="name">${esc(cat.label)} <span style="color:var(--gray);font-weight:400;font-size:11px;margin-left:4px">${percentOfTotal}%</span></div>
-        <div class="bar"><i style="width:${pct}%"></i></div>
-        <div class="amt">${fmtMoney(it.amt)}</div>
-      </div>`;
-    }).join('');
-    return `<div class="summary-list">
-      <div class="section-title" style="margin:14px 2px 6px">
-        <h2>${sec.title}汇总</h2>
-        <span class="count" style="color:${sec.type === 'expense' ? 'var(--primary)' : 'var(--income-dark)'}">合计 ${fmtMoney(sec.total)}</span>
-      </div>
-      ${rows}
-    </div>`;
-  }).join('');
-  // 联动：点击分类行 → 过滤下方明细（再点一次取消）
-  box.querySelectorAll('.summary-item').forEach(item => {
-    item.onclick = () => {
-      const k = item.dataset.key;
-      filter = filter === k ? 'all' : k;
-      renderSummary();
-      renderList();
-    };
-  });
-}
-
 /* ================= 列表 ================= */
 function filtered() {
   let list = monthRecords();
@@ -1395,8 +1436,9 @@ function confirmDelete(id) {
 function renderAll() {
   renderMonth();
   renderStats();
-  renderCharts();
-  renderSummary();
+  renderDonutCard();
+  renderRanking();
+  renderTrendCard();
   renderList();
 }
 
