@@ -177,23 +177,6 @@
   .cat-cell.selected { border-color: var(--st, var(--primary)); background: var(--st-bg, var(--primary-light)); }
   .cat-cell.selected .lbl { color: var(--st, var(--primary)); }
 
-  /* ===== Filter chips ===== */
-  .chips {
-    display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 14px;
-    -webkit-overflow-scrolling: touch; scrollbar-width: none;
-  }
-  .chips::-webkit-scrollbar { display: none; }
-  .chip {
-    flex-shrink: 0; border: none; cursor: pointer;
-    background: var(--card); color: var(--ink-2);
-    font-size: 13px; font-weight: 600;
-    padding: 8px 14px; border-radius: 20px; box-shadow: var(--shadow);
-    transition: all .18s;
-  }
-  .chip.active { color: #fff; background: var(--ink); box-shadow: 0 4px 10px rgba(31, 41, 55, .25); }
-  .chip .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
-  .chip.active .dot { background: #fff; }
-
   /* ===== Section ===== */
   .section-title {
     display: flex; align-items: center; justify-content: space-between;
@@ -360,8 +343,12 @@
   .summary-list { margin-bottom: 14px; }
   .summary-item {
     display: flex; align-items: center; gap: 10px;
-    padding: 8px 0; font-size: 13px;
+    padding: 8px 10px; margin: 0 -10px; font-size: 13px;
+    border-radius: 12px; cursor: pointer;
+    transition: background .15s;
   }
+  .summary-item:active { background: var(--gray-light); }
+  .summary-item.act { background: var(--primary-light); }
   .summary-item .ic {
     width: 28px; height: 28px; border-radius: 8px;
     display: flex; align-items: center; justify-content: center; font-size: 14px;
@@ -629,8 +616,6 @@
       <span>至</span>
       <input type="date" id="dateTo" aria-label="结束日期">
     </div>
-
-    <div class="chips" id="chips"></div>
 
     <div class="section-title">
       <h2 id="listTitle">本月明细</h2>
@@ -924,7 +909,7 @@ function switchTab(tab) {
   const fab = document.getElementById('btnAdd');
   fab.style.display = tab === 'main' ? 'flex' : 'none';
   if (tab === 'stats') renderCharts();
-  if (tab === 'main') { renderSummary(); renderChips(); renderList(); }
+  if (tab === 'main') { renderSummary(); renderList(); }
 }
 
 /* ================= 统计 ================= */
@@ -1150,7 +1135,8 @@ function renderSummary() {
       const cat = getCat(sec.type, it.key);
       const pct = Math.round(it.amt / max * 100);
       const percentOfTotal = sec.total > 0 ? Math.round(it.amt / sec.total * 100) : 0;
-      return `<div class="summary-item" style="--st:${cat.color};--st-bg:${lighten(cat.color, .12)}">
+      const act = filter === it.key ? ' act' : '';
+      return `<div class="summary-item${act}" data-key="${it.key}" style="--st:${cat.color};--st-bg:${lighten(cat.color, .12)}">
         <div class="ic">${cat.icon}</div>
         <div class="name">${esc(cat.label)} <span style="color:var(--gray);font-weight:400;font-size:11px;margin-left:4px">${percentOfTotal}%</span></div>
         <div class="bar"><i style="width:${pct}%"></i></div>
@@ -1165,41 +1151,15 @@ function renderSummary() {
       ${rows}
     </div>`;
   }).join('');
-}
-
-/* ================= chips 筛选 ================= */
-function renderChips() {
-  const list = monthRecords();
-  const counts = { all: list.length, expense: 0, income: 0 };
-  list.forEach(r => { counts[r.type] = (counts[r.type] || 0) + 1; });
-
-  const chips = [{ k: 'all', label: '全部', dot: '#1F2937' }];
-  // 收集本月出现过的分类
-  const usedExp = new Set(), usedInc = new Set();
-  list.forEach(r => { (r.type === 'income' ? usedInc : usedExp).add(r.category); });
-
-  if (usedExp.size) {
-    chips.push({ k: 'expense', label: '支出', dot: '#FF6B6B' });
-    Array.from(usedExp).forEach(k => {
-      const c = getCat('expense', k);
-      chips.push({ k, label: c.label, dot: c.color, type: 'expense' });
-    });
-  }
-  if (usedInc.size) {
-    chips.push({ k: 'income', label: '收入', dot: '#00C896' });
-    Array.from(usedInc).forEach(k => {
-      const c = getCat('income', k);
-      chips.push({ k, label: c.label, dot: c.color, type: 'income' });
-    });
-  }
-
-  const chipsEl = document.getElementById('chips');
-  chipsEl.innerHTML = chips.map(c => `
-    <button class="chip ${filter === c.k ? 'active' : ''}" data-k="${c.k}">
-      ${c.dot ? `<span class="dot" style="background:${c.dot}"></span>` : ''}${c.label}
-      <span style="opacity:.75;margin-left:2px">${counts[c.k] || ''}</span>
-    </button>`).join('');
-  chipsEl.querySelectorAll('.chip').forEach(c => c.onclick = () => { filter = c.dataset.k; renderChips(); renderList(); });
+  // 联动：点击分类行 → 过滤下方明细（再点一次取消）
+  box.querySelectorAll('.summary-item').forEach(item => {
+    item.onclick = () => {
+      const k = item.dataset.key;
+      filter = filter === k ? 'all' : k;
+      renderSummary();
+      renderList();
+    };
+  });
 }
 
 /* ================= 列表 ================= */
@@ -1431,7 +1391,6 @@ function renderAll() {
   renderStats();
   renderCharts();
   renderSummary();
-  renderChips();
   renderList();
 }
 
