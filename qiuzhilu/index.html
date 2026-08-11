@@ -444,6 +444,8 @@
     vertical-align: top;
   }
   .cmp-table thead th { font-size: 12px; color: var(--ink-2); font-weight: 700; white-space: nowrap; }
+  .cmp-table th[data-id], .cmp-table td[data-id] { cursor: pointer; transition: background .12s; }
+  .cmp-table th[data-id]:hover, .cmp-table td[data-id]:hover { background: var(--primary-light); }
   .cmp-table td.co { font-weight: 800; color: var(--primary-dark); white-space: nowrap; }
   .cmp-empty { text-align: center; color: var(--gray); padding: 30px 0; font-size: 13px; line-height: 1.7; }
 
@@ -1278,19 +1280,23 @@ function renderCompare() {
     return;
   }
   const get = (r, k) => (r.offerInfo && r.offerInfo[k] && String(r.offerInfo[k]).trim()) || '—';
+  // 渲染时给每列的 th/td 都打上 data-id，点击可跳到对应记录的编辑页补全信息
   list.innerHTML = `<div class="cmp-wrap"><table class="cmp-table">
-    <thead><tr><th>对比项</th>${offers.map(r => `<th>${esc(r.company)}</th>`).join('')}</tr></thead>
+    <thead><tr><th>对比项</th>${offers.map(r => `<th data-id="${r.id}">${esc(r.company)}</th>`).join('')}</tr></thead>
     <tbody>
-      <tr><td class="co">公司</td>${offers.map(r => `<td>${esc(r.company)}${r.position ? '<br><span style="font-weight:400;color:var(--ink-2)">' + esc(r.position) + '</span>' : ''}</td>`).join('')}</tr>
-      <tr><td class="co">基本月薪</td>${offers.map(r => `<td>${esc(get(r, 'base'))}</td>`).join('')}</tr>
-      <tr><td class="co">绩效/年终</td>${offers.map(r => `<td>${esc(get(r, 'bonus'))}</td>`).join('')}</tr>
-      <tr><td class="co">期权/股票</td>${offers.map(r => `<td>${esc(get(r, 'stock'))}</td>`).join('')}</tr>
-      <tr><td class="co">加班情况</td>${offers.map(r => `<td>${esc(get(r, 'overtime'))}</td>`).join('')}</tr>
-      <tr><td class="co">通勤时间</td>${offers.map(r => `<td>${esc(get(r, 'commute'))}</td>`).join('')}</tr>
+      <tr><td class="co">公司</td>${offers.map(r => `<td data-id="${r.id}">${esc(r.company)}${r.position ? '<br><span style="font-weight:400;color:var(--ink-2)">' + esc(r.position) + '</span>' : ''}</td>`).join('')}</tr>
+      <tr><td class="co">基本月薪</td>${offers.map(r => `<td data-id="${r.id}">${esc(get(r, 'base'))}</td>`).join('')}</tr>
+      <tr><td class="co">绩效/年终</td>${offers.map(r => `<td data-id="${r.id}">${esc(get(r, 'bonus'))}</td>`).join('')}</tr>
+      <tr><td class="co">期权/股票</td>${offers.map(r => `<td data-id="${r.id}">${esc(get(r, 'stock'))}</td>`).join('')}</tr>
+      <tr><td class="co">加班情况</td>${offers.map(r => `<td data-id="${r.id}">${esc(get(r, 'overtime'))}</td>`).join('')}</tr>
+      <tr><td class="co">通勤时间</td>${offers.map(r => `<td data-id="${r.id}">${esc(get(r, 'commute'))}</td>`).join('')}</tr>
     </tbody>
   </table></div>
-  <div class="funnel-tip" style="margin-top:10px;padding:0 4px">💡 点击某一行记录可补充完整的薪资福利信息。</div>`;
-  list.querySelectorAll('.cmp-table td').forEach(() => {});
+  <div class="funnel-tip" style="margin-top:10px;padding:0 4px">💡 点击任意格子可快速补充该公司的薪资福利信息。</div>`;
+  // 点击表格任意单元格 → 跳到对应记录的编辑弹窗
+  list.querySelectorAll('[data-id]').forEach(el => {
+    el.onclick = () => openEditor(el.dataset.id);
+  });
 }
 
 /* ================= 状态快捷切换 ================= */
