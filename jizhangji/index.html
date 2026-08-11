@@ -1030,7 +1030,8 @@ function renderDonut(type) {
     if (i === items.length - 1) p = 1 - acc; // 最后一段补齐避免舍入误差
     if (p < minSeg) p = minSeg;
     const len = C * p;
-    const offset = -acc * C;
+    const startAcc = acc;                     // 该扇区起点前的累计比例
+    const offset = -startAcc * C;
     acc += p;
 
     const isActive = filter === it.key;
@@ -1044,11 +1045,12 @@ function renderDonut(type) {
 
     if (isActive) {
       // 外圈高亮环：r=58 宽 4（覆盖 56~60），紧贴饼图外边缘(55)，同色半透明 + 微光
+      // 注意：dashoffset 必须用外环自己的周长 cRing 算，否则角度偏移完全错位
       const rRing = 58, cRing = 2 * Math.PI * rRing;
       segs.push(`<circle cx="60" cy="60" r="${rRing}" fill="none" stroke="${it.cat.color}" stroke-width="4"
         stroke-opacity="0.55"
         stroke-dasharray="${(cRing * p).toFixed(2)} ${(cRing * (1 - p)).toFixed(2)}"
-        stroke-dashoffset="${offset.toFixed(2)}"
+        stroke-dashoffset="${(-startAcc * cRing).toFixed(2)}"
         transform="rotate(-90 60 60)"
         class="donut-seg donut-ring" data-key="${it.key}"
         style="cursor:pointer; filter: drop-shadow(0 0 3px ${it.cat.color})" />`);
