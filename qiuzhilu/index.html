@@ -1066,8 +1066,8 @@ function renderFunnel() {
       <h2>求职转化漏斗</h2>
       ${bar(f.total, '#94A3B8', '投递', '')}
       ${bar(f.toInterview, '#4C7DFF', '进面试', f.inviteRate + '% 邀请率')}
-      ${bar(f.offer, '#00C896', '拿Offer', f.offerRate + '% 成功率')}
-      <div class="funnel-tip">投递 → 面试邀请率 <b>${f.inviteRate}%</b>；面试 → Offer 成功率 <b>${f.offerRate}%</b>。数据越多越有参考价值。</div>
+      ${bar(f.offer, '#00C896', '已OC', f.offerRate + '% 成功率')}
+      <div class="funnel-tip">投递 → 面试邀请率 <b>${f.inviteRate}%</b>；面试 → 已OC 成功率 <b>${f.offerRate}%</b>。数据越多越有参考价值。</div>
     </div>`;
 }
 
