@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>LeetTrack 刷题录</title>
+<meta name="description" content="LeetTrack - 手机端刷题记忆与打卡工具：Hot 100 / Top 150 题库、三阶解法、闪卡复习、打卡热力图，全离线可用">
+<meta name="theme-color" content="#059669">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="LeetTrack">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='2' width='20' height='20' rx='6' fill='%23059669'/%3E%3Cpath d='M8 12.5l3 3 5-6' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #F3F8F5; --card: #FFFFFF; --ink: #1F2937; --ink-2: #64748B;
+    --primary: #10B981; --primary-2: #059669; --primary-light: #D1FAE5;
+    --gray: #94A3B8; --gray-light: #EEF2F7;
+    --easy: #22C55E; --easy-bg: #DCFCE7; --medium: #F59E0B; --medium-bg: #FEF3C7;
+    --hard: #EF4444; --hard-bg: #FEE2E2;
+    --shadow: 0 6px 20px rgba(16, 185, 129, .08), 0 2px 6px rgba(16, 185, 129, .04);
+    --tab-h: 58px; --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0B1220; --card: #141E2E; --ink: #E5EAF3; --ink-2: #93A4BA;
+      --primary: #34D399; --primary-2: #10B981; --primary-light: #10372B;
+      --gray: #5E7188; --gray-light: #1C2838;
+      --easy: #4ADE80; --easy-bg: #123524; --medium: #FBBF24; --medium-bg: #382B12;
+      --hard: #F87171; --hard-bg: #3A1717;
+      --shadow: 0 6px 20px rgba(0,0,0,.35);
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--ink); min-height: 100dvh;
+    padding-bottom: calc(var(--tab-h) + var(--safe-bottom));
+  }
+  .page { max-width: 480px; margin: 0 auto; padding: calc(16px + env(safe-area-inset-top)) 16px 20px; display: none; }
+  .page.on { display: block; }
+  header.top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .logo { display: flex; align-items: center; gap: 8px; }
+  .logo-ic { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--primary-2)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 15px; }
+  h1 { font-size: 21px; font-weight: 800; letter-spacing: .3px; }
+  .sub { font-size: 12px; color: var(--ink-2); margin-top: 2px; }
+  .icon-btn { border: none; background: var(--card); color: var(--ink); width: 36px; height: 36px; border-radius: 10px; font-size: 17px; box-shadow: var(--shadow); cursor: pointer; }
+
+  .card { background: var(--card); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 14px; }
+  .card-t { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  .card-t .more { margin-left: auto; font-size: 12px; font-weight: 400; color: var(--ink-2); }
+
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 600; }
+  .b-easy { background: var(--easy-bg); color: var(--easy); }
+  .b-medium { background: var(--medium-bg); color: var(--medium); }
+  .b-hard { background: var(--hard-bg); color: var(--hard); }
+  .b-st { background: var(--gray-light); color: var(--ink-2); }
+  .b-st.ac { background: var(--primary-light); color: var(--primary-2); }
+  .b-st.review { background: var(--medium-bg); color: var(--medium); }
+  .b-st.doing { background: var(--gray-light); color: var(--primary-2); }
+
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 10px; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex-shrink: 0; border: 1px solid var(--gray-light); background: var(--card); color: var(--ink-2); font-size: 12px; padding: 6px 13px; border-radius: 99px; cursor: pointer; }
+  .chip.act { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+
+  .q-item { display: flex; align-items: center; gap: 10px; padding: 11px 4px; border-bottom: 0.5px solid var(--gray-light); cursor: pointer; }
+  .q-item:last-child { border-bottom: none; }
+  .q-no { font-size: 12px; color: var(--gray); width: 42px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .q-main { flex: 1; min-width: 0; }
+  .q-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .q-meta { font-size: 11px; color: var(--gray); margin-top: 3px; display: flex; gap: 6px; align-items: center; }
+  .q-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .d-todo { background: var(--gray); } .d-doing { background: var(--primary); } .d-ac { background: var(--easy); } .d-review { background: var(--medium); }
+  .q-arrow { color: var(--gray); font-size: 12px; flex-shrink: 0; }
+
+  .search { width: 100%; border: 1px solid var(--gray-light); background: var(--card); color: var(--ink); border-radius: 12px; padding: 10px 14px; font-size: 14px; margin-bottom: 10px; outline: none; }
+  .search:focus { border-color: var(--primary); }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat { background: var(--card); border-radius: 14px; padding: 12px 6px; text-align: center; box-shadow: var(--shadow); }
+  .stat .num { font-size: 20px; font-weight: 800; color: var(--primary-2); font-variant-numeric: tabular-nums; }
+  .stat .lb { font-size: 11px; color: var(--ink-2); margin-top: 2px; }
+  .stat.warn .num { color: var(--medium); }
+
+  .hm-wrap { overflow-x: auto; }
+  .heatmap { display: grid; grid-template-rows: repeat(7, 10px); grid-auto-flow: column; gap: 3px; padding: 4px 0 8px; width: max-content; }
+  .hm-cell { width: 10px; height: 10px; border-radius: 2.5px; background: var(--gray-light); }
+  .hm-1 { background: #A7F3D0; } .hm-2 { background: #6EE7B7; } .hm-3 { background: #34D399; } .hm-4 { background: #059669; }
+  @media (prefers-color-scheme: dark) { .hm-1 { background: #134E3A; } .hm-2 { background: #0F766E; } .hm-3 { background: #10B981; } .hm-4 { background: #34D399; } }
+  .hm-axis { display: flex; justify-content: space-between; font-size: 10px; color: var(--gray); }
+  .hm-lv { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--gray); margin-top: 6px; }
+
+  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .bar-lb { width: 56px; font-size: 12px; color: var(--ink-2); flex-shrink: 0; }
+  .bar-track { flex: 1; height: 14px; background: var(--gray-light); border-radius: 7px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 7px; background: var(--primary); min-width: 3px; }
+  .bar-val { width: 34px; font-size: 12px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+
+  .trend { display: flex; align-items: flex-end; gap: 5px; height: 88px; padding-top: 4px; }
+  .t-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; }
+  .t-bar { width: 60%; max-width: 16px; border-radius: 4px 4px 2px 2px; background: var(--primary); min-height: 2px; }
+  .t-bar.z { background: var(--gray-light); }
+  .t-lb { font-size: 9px; color: var(--gray); }
+
+  .rec-card { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 0.5px solid var(--gray-light); }
+  .rec-card:last-child { border-bottom: none; }
+  .rec-main { flex: 1; min-width: 0; cursor: pointer; }
+  .rec-btns { display: flex; gap: 6px; flex-shrink: 0; }
+  .mini-btn { border: 1px solid var(--gray-light); background: var(--card); color: var(--ink-2); font-size: 12px; padding: 5px 10px; border-radius: 99px; cursor: pointer; }
+  .mini-btn.ok { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+
+  .btn-primary { width: 100%; border: none; background: var(--primary); color: #fff; font-size: 15px; font-weight: 700; padding: 13px; border-radius: 14px; cursor: pointer; box-shadow: var(--shadow); }
+  .btn-ghost { width: 100%; border: 1px solid var(--gray-light); background: var(--card); color: var(--ink-2); font-size: 14px; padding: 12px; border-radius: 14px; cursor: pointer; }
+
+  .tabbar { position: fixed; left: 0; right: 0; bottom: 0; max-width: 480px; margin: 0 auto; height: calc(var(--tab-h) + var(--safe-bottom)); padding-bottom: var(--safe-bottom); background: var(--card); border-top: 0.5px solid var(--gray-light); display: flex; z-index: 50; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--gray); font-size: 11px; cursor: pointer; }
+  .tab .ic { font-size: 20px; line-height: 1; }
+  .tab.act { color: var(--primary-2); font-weight: 700; }
+
+  .sheet { position: fixed; left: 0; right: 0; bottom: 0; max-width: 480px; margin: 0 auto; background: var(--card); border-radius: 20px 20px 0 0; z-index: 100; transform: translateY(100%); transition: transform .25s; max-height: 86dvh; display: flex; flex-direction: column; }
+  .sheet.on { transform: translateY(0); }
+  .sheet-head { display: flex; align-items: center; gap: 8px; padding: 16px 16px 10px; flex-shrink: 0; }
+  .sheet-body { overflow-y: auto; padding: 0 16px calc(20px + var(--safe-bottom)); flex: 1; }
+  .sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--gray-light); margin: 8px auto 0; }
+  .mask { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 90; opacity: 0; pointer-events: none; transition: opacity .25s; }
+  .mask.on { opacity: 1; pointer-events: auto; }
+
+  .status-row { display: flex; gap: 6px; margin: 12px 0; flex-wrap: wrap; }
+  .st-btn { flex: 1; min-width: 70px; border: 1px solid var(--gray-light); background: var(--card); color: var(--ink-2); font-size: 12px; padding: 8px 4px; border-radius: 10px; cursor: pointer; text-align: center; }
+  .st-btn.act { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 700; }
+
+  .tier { border: 1px solid var(--gray-light); border-radius: 12px; margin-bottom: 8px; overflow: hidden; }
+  .tier-h { display: flex; align-items: center; gap: 8px; padding: 10px 12px; cursor: pointer; font-size: 13px; font-weight: 600; }
+  .tier-h .tg { width: 22px; height: 22px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; font-weight: 700; flex-shrink: 0; }
+  .tg-1 { background: #22C55E; } .tg-2 { background: #F59E0B; } .tg-3 { background: #EF4444; }
+  .tier-h .arr { margin-left: auto; color: var(--gray); transition: transform .2s; }
+  .tier.open .arr { transform: rotate(180deg); }
+  .tier-b { display: none; padding: 4px 12px 12px; font-size: 13px; color: var(--ink-2); line-height: 1.7; }
+  .tier.open .tier-b { display: block; }
+  .tier-b code { display: block; background: var(--bg); border-radius: 8px; padding: 10px; font-size: 12px; white-space: pre-wrap; word-break: break-all; font-family: ui-monospace, "SF Mono", Consolas, monospace; margin-top: 8px; color: var(--ink); }
+  .edit-btn { border: 1px dashed var(--gray); background: none; color: var(--gray); font-size: 11px; padding: 4px 10px; border-radius: 99px; cursor: pointer; }
+
+  .empty { text-align: center; color: var(--gray); font-size: 13px; padding: 28px 0; line-height: 1.8; }
+
+  .flash { position: fixed; inset: 0; z-index: 200; background: var(--bg); display: none; flex-direction: column; }
+  .flash.on { display: flex; }
+  .flash-head { display: flex; align-items: center; justify-content: space-between; padding: calc(14px + env(safe-area-inset-top)) 16px 8px; }
+  .flash-body { flex: 1; overflow-y: auto; padding: 12px 20px 20px; display: flex; flex-direction: column; }
+  .f-card { background: var(--card); border-radius: 20px; padding: 34px 22px; text-align: center; box-shadow: var(--shadow); margin: 24px 0; flex-shrink: 0; }
+  .f-front { min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; }
+  .f-back { display: none; text-align: left; }
+  .f-card.revealed .f-front { display: none; }
+  .f-card.revealed .f-back { display: block; }
+  .f-title { font-size: 20px; font-weight: 800; }
+  .f-hint { font-size: 13px; color: var(--gray); }
+  .f-actions { display: flex; gap: 10px; margin-top: auto; padding-bottom: calc(12px + var(--safe-bottom)); flex-shrink: 0; }
+  .f-btn { flex: 1; border: none; border-radius: 14px; padding: 14px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .f-btn.good { background: var(--primary); color: #fff; }
+  .f-btn.rev { background: var(--medium); color: #fff; }
+  .f-btn.next { background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
+  .f-progress { font-size: 12px; color: var(--gray); }
+</style>
+</head>
+<body>
+
+<header class="top page-head" style="max-width:480px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 16px 0;display:flex;align-items:center;justify-content:space-between;">
+  <div class="logo">
+    <div class="logo-ic">✓</div>
+    <div>
+      <h1>LeetTrack</h1>
+      <div class="sub">刷题 · 记忆 · 打卡</div>
+    </div>
+  </div>
+  <button class="icon-btn" id="themeBtn" title="切换主题">◐</button>
+</header>
+
+<div class="page on" id="pageToday"></div>
+<div class="page" id="pageBank"></div>
+<div class="page" id="pageStats"></div>
+
+<nav class="tabbar">
+  <div class="tab act" data-tab="today"><span class="ic">☀</span>今日</div>
+  <div class="tab" data-tab="bank"><span class="ic">📚</span>题库</div>
+  <div class="tab" data-tab="stats"><span class="ic">📊</span>统计</div>
+</nav>
+
+<div class="mask" id="mask"></div>
+<div class="sheet" id="detailSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head"><div class="logo-ic" id="dIc" style="width:28px;height:28px;font-size:12px">✓</div><div style="flex:1;min-width:0"><div id="dTitle" style="font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div><div id="dMeta" style="font-size:11px;color:var(--gray);margin-top:2px"></div></div><button class="icon-btn" id="dLink" style="width:34px;height:34px;font-size:15px">↗</button></div>
+  <div class="sheet-body">
+    <div class="status-row" id="dStatus"></div>
+    <div id="dTiers"></div>
+    <div style="text-align:center;margin-top:6px"><button class="edit-btn" id="dEdit">✎ 编辑解法内容</button></div>
+  </div>
+</div>
+
+<div class="flash" id="flash">
+  <div class="flash-head">
+    <button class="icon-btn" id="flashClose" style="background:none;box-shadow:none;color:var(--ink-2)">✕</button>
+    <div class="f-progress" id="flashProg"></div>
+    <button class="icon-btn" id="flashNext" style="background:none;box-shadow:none;color:var(--ink-2);font-size:14px">下一张 ›</button>
+  </div>
+  <div class="flash-body">
+    <div class="f-card" id="fCard">
+      <div class="f-front" id="fFront">
+        <div id="fMeta" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"></div>
+        <div class="f-title" id="fTitle"></div>
+        <div class="f-hint">先在心里想思路，再点卡片翻面</div>
+      </div>
+      <div class="f-back" id="fBack"></div>
+    </div>
+  </div>
+  <div class="f-actions">
+    <button class="f-btn rev" id="fRev">待复习</button>
+    <button class="f-btn good" id="fGood">已掌握 ✓</button>
+  </div>
+</div>
+
+<script src="data/questions.js"></script>
+<script>
+/* ============ 常量 ============ */
+const STORE = 'leetrack.v1';
+const THEME_KEY = 'leetrack.theme';
+const DIFF = { Easy: ['简单', 'b-easy'], Medium: ['中等', 'b-medium'], Hard: ['困难', 'b-hard'] };
+const ST_CN = { todo: '待做', doing: '进行中', ac: '已AC', review: '需复习' };
+const ST_NEXT = { todo: 'doing', doing: 'ac', ac: 'review', review: 'todo' };
+const LISTS = { all: '全部题单', hot100: 'Hot 100', top150: 'Top 150' };
+
+/* 预置三阶解法示例（部分经典题；其余可自行编辑） */
+const SOLUTIONS = {
+  1: { t: ['遍历数组，两两求和比较，正确性优先', '一次遍历，用哈希表记录「补数」target-nums[i] 是否已出现', '极致技巧：本题 O(n) 已最优，强调「边遍历边查」避免二次扫描'], c: ['def twoSum(nums, target):\n    n = len(nums)\n    for i in range(n):\n        for j in range(i+1, n):\n            if nums[i]+nums[j] == target:\n                return [i, j]', 'def twoSum(nums, target):\n    seen = {}\n    for i, v in enumerate(nums):\n        if target - v in seen:\n            return [seen[target-v], i]\n        seen[v] = i', '同解法2。追问考点：重复元素、先查后存保证不重复用同一元素'] },
+  206: { t: ['新建链表逐个头插，需要额外空间', '三指针 prev/cur/next 原地翻转，迭代', '递归翻转：假设子链表已翻转，把当前节点挂到末尾'], c: ['def reverseList(head):\n    cur, prev = head, None\n    while cur:\n        nxt = cur.next\n        cur.next = prev\n        prev, cur = cur, nxt\n    return prev', '同上，原地 O(1) 空间', 'def reverseList(head):\n    if not head or not head.next: return head\n    p = reverseList(head.next)\n    head.next.next = head\n    head.next = None\n    return p'] },
+  70: { t: ['DFS 枚举所有爬法，指数级', 'dp[i] = dp[i-1] + dp[i-2]，滚动数组压到 O(1)', '通项公式/矩阵快速幂，面试一般到滚动数组即可'], c: ['def climbStairs(n):\n    if n <= 2: return n\n    return climbStairs(n-1) + climbStairs(n-2)', 'def climbStairs(n):\n    a = b = 1\n    for _ in range(n-1):\n        a, b = b, a + b\n    return b', '矩阵快速幂：[[1,1],[1,0]]^n，进阶面试题'] },
+  20: { t: ['暴力替换成对括号，O(n²)', '栈匹配：左括号入栈，右括号比对栈顶', '用字典映射配对，代码更简洁'], c: ['def isValid(s):\n    while "()" in s or "[]" in s or "{}" in s:\n        s = s.replace("()","").replace("[]","").replace("{}","")\n    return not s', 'def isValid(s):\n    st = []\n    for c in s:\n        if c in "([{": st.append(c)\n        elif not st or abs(ord(c)-ord(st.pop())) > 2: return False\n    return not st', '字典 + 栈：pair = {")":"(","]":"[","}":"{"}，最清晰的写法'] },
+  121: { t: ['双重循环比较所有买卖日，O(n²)', '一次遍历：记录历史最低价，算当前利润取最大', '贪心思想，O(1) 空间；追问可扩展 K 次交易'], c: ['def maxProfit(prices):\n    best = 0\n    for i in range(len(prices)):\n        for j in range(i+1, len(prices)):\n            best = max(best, prices[j]-prices[i])\n    return best', 'def maxProfit(prices):\n    mi, best = float("inf"), 0\n    for p in prices:\n        mi = min(mi, p)\n        best = max(best, p - mi)\n    return best', '同解法2。延伸：股票问题系列（II/III/IV、冷冻期）都是这个状态机思路'] },
+  53: { t: ['枚举所有子数组求和，O(n²)', 'dp[i] = max(nums[i], dp[i-1]+nums[i])，滚动变量', '分治：跨中点的最大子段和，O(n log n)'], c: ['def maxSubArray(nums):\n    best = float("-inf")\n    for i in range(len(nums)):\n        s = 0\n        for j in range(i, len(nums)):\n            s += nums[j]\n            best = max(best, s)\n    return best', 'def maxSubArray(nums):\n    cur = best = nums[0]\n    for x in nums[1:]:\n        cur = max(x, cur + x)\n        best = max(best, cur)\n    return best', '分治：递归左右 + 跨中点最大和，适合追问「如何支持区间查询」'] },
+  141: { t: ['哈希集合记录访问过的节点，空间 O(n)', '快慢指针：慢走1步快走2步，有环必相遇', '快慢指针进阶：找环入口（142 题）用相遇点+头节点同步走'], c: ['def hasCycle(head):\n    seen = set()\n    while head:\n        if head in seen: return True\n        seen.add(head); head = head.next\n    return False', 'def hasCycle(head):\n    slow = fast = head\n    while fast and fast.next:\n        slow = slow.next\n        fast = fast.next.next\n        if slow is fast: return True\n    return False', '相遇后：slow=head 再同步走，相遇点即环入口（142 题核心）'] },
+  3: { t: ['枚举所有子串判断无重复，O(n³)', '滑动窗口 + 哈希集合，O(n)', '优化：用哈希表记录字符最新下标，窗口直接跳到重复处'], c: ['def lengthOfLongestSubstring(s):\n    best = 0\n    for i in range(len(s)):\n        for j in range(i, len(s)):\n            if len(set(s[i:j+1])) == j-i+1:\n                best = max(best, j-i+1)\n    return best', 'def lengthOfLongestSubstring(s):\n    seen, l, best = set(), 0, 0\n    for r, c in enumerate(s):\n        while c in seen:\n            seen.remove(s[l]); l += 1\n        seen.add(c); best = max(best, r-l+1)\n    return best', 'def lengthOfLongestSubstring(s):\n    pos, l, best = {}, 0, 0\n    for r, c in enumerate(s):\n        l = max(l, pos.get(c, -1) + 1)\n        pos[c] = r\n        best = max(best, r - l + 1)\n    return best'] },
+  15: { t: ['三重循环 + 去重，O(n³)', '排序后固定一个数，双指针收缩找两数之和', '剪枝：跳过重复元素；与 target 比较决定指针移动'], c: ['def threeSum(nums):\n    res, n = set(), len(nums)\n    for i in range(n):\n        for j in range(i+1, n):\n            for k in range(j+1, n):\n                if nums[i]+nums[j]+nums[k] == 0:\n                    res.add(tuple(sorted((nums[i],nums[j],nums[k]))))\n    return [list(t) for t in res]', 'def threeSum(nums):\n    nums.sort(); res = []\n    for i in range(len(nums)-2):\n        if i and nums[i]==nums[i-1]: continue\n        l, r = i+1, len(nums)-1\n        while l < r:\n            s = nums[i]+nums[l]+nums[r]\n            if s < 0: l += 1\n            elif s > 0: r -= 1\n            else:\n                res.append([nums[i],nums[l],nums[r]])\n                while l<r and nums[l]==nums[l+1]: l += 1\n                while l<r and nums[r]==nums[r-1]: r -= 1\n                l += 1; r -= 1\n    return res', '同解法2，注意「先排序 + 跳过重复」是关键去重手法'] },
+  200: { t: ['遍历每个 1，DFS 淹掉整座岛，计数', 'BFS 队列实现，避免递归栈溢出', '并查集 Union-Find，适合海量数据/增量场景'], c: ['def numIslands(grid):\n    def dfs(i, j):\n        if not (0<=i<len(grid) and 0<=j<len(grid[0])) or grid[i][j]!="1": return\n        grid[i][j] = "0"\n        for di, dj in ((1,0),(-1,0),(0,1),(0,-1)): dfs(i+di, j+dj)\n    cnt = 0\n    for i in range(len(grid)):\n        for j in range(len(grid[0])):\n            if grid[i][j] == "1": cnt += 1; dfs(i, j)\n    return cnt', 'BFS：队列存坐标，visited 数组防重复', '并查集：所有 "1" 初始各自成集，合并相邻的，数集合数'] },
+  46: { t: ['DFS 全排列，used 数组标记已选', '回溯模板：路径 + 选择列表 + 撤销', '带剪枝/字典序变体；注意回溯本质是状态重置'], c: ['def permute(nums):\n    res, path, used = [], [], [False]*len(nums)\n    def dfs():\n        if len(path) == len(nums): res.append(path[:]); return\n        for i, x in enumerate(nums):\n            if used[i]: continue\n            used[i] = True; path.append(x)\n            dfs()\n            path.pop(); used[i] = False\n    dfs(); return res', '同解法1，回溯标准模板', '进阶：含重复元素的全排列（47 题），排序后跳过同层重复'] },
+  35: { t: ['线性扫描找第一个 >= target 的位置', '标准二分查找，左闭右闭', '二分变体：求「插入位置」即 lower_bound'], c: ['def searchInsert(nums, target):\n    for i, x in enumerate(nums):\n        if x >= target: return i\n    return len(nums)', 'def searchInsert(nums, target):\n    l, r = 0, len(nums)\n    while l < r:\n        m = (l + r) // 2\n        if nums[m] < target: l = m + 1\n        else: r = m\n    return l', 'Python 直接 bisect_left(nums, target)'] },
+  136: { t: ['哈希表计数，空间 O(n)', '异或：a^a=0，0^a=a，全部异或即答案', '位运算本质：出现偶数次抵消，O(1) 空间'], c: ['def singleNumber(nums):\n    from collections import Counter\n    return Counter(nums).most_common()[-1][0]', 'def singleNumber(nums):\n    r = 0\n    for x in nums: r ^= x\n    return r', '同解法2。进阶：其余出现 3 次（137 题）用逐位统计'] },
+  226: { t: ['递归：交换左右子树', '迭代：栈/队列层序翻转', 'Morris 遍历翻转（极进阶，一般不必）'], c: ['def invertTree(root):\n    if not root: return None\n    root.left, root.right = root.right, root.left\n    invertTree(root.left); invertTree(root.right)\n    return root', 'BFS 层序，每层节点交换左右孩子', '递归解法已最优；追问只考理解，不会要 Morris'] },
+  78: { t: ['枚举所有子集，2^n 个，位掩码', '回溯：选/不选 两个分支', '迭代增量：每来一个数，往已有子集里追加'], c: ['def subsets(nums):\n    res = []\n    for mask in range(1 << len(nums)):\n        res.append([nums[i] for i in range(len(nums)) if mask >> i & 1])\n    return res', 'def subsets(nums):\n    res, path = [], []\n    def dfs(i):\n        if i == len(nums): res.append(path[:]); return\n        dfs(i+1)\n        path.append(nums[i]); dfs(i+1); path.pop()\n    dfs(0); return res', '迭代：res = [[]]; for x in nums: res += [s+[x] for s in res]'] }
+};
+
+/* ============ 状态 ============ */
+let state = load();
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORE)) || { records: {}, checkins: {} }; }
+  catch (e) { return { records: {}, checkins: {} }; }
+}
+function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} }
+
+const qmap = {};
+window.LEET_QUESTIONS.forEach(q => qmap[q.id] = q);
+function todayStr() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function fmt(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+/* ============ 主题 ============ */
+let dark = localStorage.getItem(THEME_KEY) === '1';
+function applyTheme() {
+  document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+  if (dark) document.documentElement.style.setProperty('--bg', '#0B1220');
+  document.getElementById('themeBtn').textContent = dark ? '◑' : '◐';
+}
+document.getElementById('themeBtn').onclick = () => { dark = !dark; localStorage.setItem(THEME_KEY, dark ? '1' : '0'); applyTheme(); };
+applyTheme();
+
+/* ============ Tab ============ */
+function switchTab(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.getElementById('page' + ({ today: 'Today', bank: 'Bank', stats: 'Stats' })[name]).classList.add('on');
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('act', t.dataset.tab === name));
+  if (name === 'today') renderToday();
+  if (name === 'bank') renderBank();
+  if (name === 'stats') renderStats();
+}
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => switchTab(t.dataset.tab));
+
+/* ============ 工具 ============ */
+function getRec(qid) { return state.records[qid] || { st: 'todo', lv: 0, ac: '' }; }
+function setStatus(qid, st) {
+  const r = getRec(qid);
+  const today = todayStr();
+  r.st = st;
+  if (st === 'ac') { r.ac = today; r.lv = Math.max(r.lv, 1); addCheckin(qid, today); }
+  if (st === 'review' && r.ac) { /* 复习标记，保留 ac 日期 */ }
+  if (st === 'todo') r.ac = '';
+  state.records[qid] = r;
+  save();
+}
+function addCheckin(qid, date) {
+  state.checkins[date] = state.checkins[date] || [];
+  if (!state.checkins[date].includes(qid)) state.checkins[date].push(qid);
+}
+function streak() {
+  const days = Object.keys(state.checkins);
+  if (!days.length) return 0;
+  const set = new Set(days);
+  let n = 0, d = new Date();
+  if (!set.has(fmt(d))) d.setDate(d.getDate() - 1);   // 今天没打卡从昨天起算，不立即断
+  while (set.has(fmt(d))) { n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+function todayCount() { return (state.checkins[todayStr()] || []).length; }
+function acCount() { return Object.values(state.records).filter(r => r.st === 'ac').length; }
+function reviewCount() { return Object.values(state.records).filter(r => r.st === 'review').length; }
+
+/* 推荐队列：复习优先 > 待做 > 进行中 > 已AC但掌握<3 */
+function recommend() {
+  const recs = [];
+  const bySt = k => Object.keys(qmap).filter(id => getRec(id).st === k);
+  const rev = bySt('review').sort((a, b) => (getRec(a).ac || '').localeCompare(getRec(b).ac || ''));
+  const todo = bySt('todo');
+  const doing = bySt('doing');
+  const low = bySt('ac').filter(id => getRec(id).lv < 3).sort((a, b) => (getRec(a).ac || '').localeCompare(getRec(b).ac || ''));
+  recs.push(...rev, ...todo, ...doing, ...low);
+  if (!recs.length) return [];
+  // 去重 + 随机选 2
+  const uniq = [...new Set(recs)];
+  const pick = uniq.length <= 2 ? uniq : [uniq[Math.floor(Math.random() * uniq.length)], uniq[Math.floor(Math.random() * uniq.length)]];
+  return [...new Set(pick)];
+}
+
+/* ============ 今日页 ============ */
+function renderToday() {
+  const el = document.getElementById('pageToday');
+  const today = todayStr();
+  const recs = recommend();
+  const recHtml = recs.length ? recs.map(id => {
+    const q = qmap[id], r = getRec(id);
+    return `<div class="rec-card">
+      <div class="rec-main" onclick="openFlash(${q.id})">
+        <div style="display:flex;align-items:center;gap:6px"><span class="q-title" style="max-width:150px">#${q.id} ${esc(q.title)}</span><span class="badge ${DIFF[q.difficulty][1]}">${DIFF[q.difficulty][0]}</span></div>
+        <div class="q-meta"><span>${esc(q.group)}</span>${r.st !== 'todo' ? '<span>· ' + ST_CN[r.st] + (r.st === 'review' ? '（' + (r.ac || '') + '）' : '') + '</span>' : ''}</div>
+      </div>
+      <div class="rec-btns">
+        <button class="mini-btn ok" onclick="event.stopPropagation();quickAC(${q.id})">已掌握</button>
+        <button class="mini-btn" onclick="event.stopPropagation();quickReview(${q.id})">待复习</button>
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty">太棒了！今日推荐已全部消化 🎉<br>去题库逛逛新题吧</div>';
+
+  el.innerHTML = `
+    <div class="card" style="background:linear-gradient(135deg,var(--primary),var(--primary-2));box-shadow:0 10px 28px rgba(16,185,129,.3)">
+      <div style="display:flex;align-items:center;justify-content:space-between;color:#fff">
+        <div>
+          <div style="font-size:12px;opacity:.85">${today} · 已打卡 ${todayCount()} 题</div>
+          <div style="font-size:26px;font-weight:800;margin-top:4px">连续 ${streak()} 天</div>
+        </div>
+        <div style="font-size:44px;opacity:.9">${streak() > 0 ? '🔥' : '🌱'}</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <a class="btn-primary" href="https://leetcode.cn/problems/" target="_blank" rel="noopener" style="display:block;background:rgba(255,255,255,.22);text-align:center;text-decoration:none;font-size:13px;padding:10px">每日一题 ↗</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-t">今日推荐 <span class="more">点卡片进闪卡复习</span></div>
+      ${recHtml}
+    </div>`;
+}
+function quickAC(qid) { setStatus(qid, 'ac'); toast('已掌握 ✓ 记入今日打卡'); renderToday(); }
+function quickReview(qid) { setStatus(qid, 'review'); toast('已加入待复习'); renderToday(); }
+
+/* ============ 题库页 ============ */
+let bankList = 'all', bankDiff = 'all', bankGroup = 'all', bankSt = 'all', bankKw = '';
+function renderBank() {
+  const el = document.getElementById('pageBank');
+  let list = Object.values(qmap);
+  if (bankList !== 'all') list = list.filter(q => q.lists.includes(bankList));
+  if (bankDiff !== 'all') list = list.filter(q => q.difficulty === bankDiff);
+  if (bankGroup !== 'all') list = list.filter(q => q.group === bankGroup);
+  if (bankSt !== 'all') list = list.filter(q => getRec(q.id).st === bankSt);
+  if (bankKw) list = list.filter(q => String(q.id).includes(bankKw) || q.title.includes(bankKw) || q.slug.includes(bankKw));
+  list.sort((a, b) => a.id - b.id);
+
+  const groups = [...new Set(Object.values(qmap).map(q => q.group))].sort();
+  const listChips = ['all', 'hot100', 'top150'].map(k => `<span class="chip ${bankList === k ? 'act' : ''}" onclick="setBankList('${k}')">${LISTS[k]}</span>`).join('');
+  const diffChips = ['all', 'Easy', 'Medium', 'Hard'].map(k => `<span class="chip ${bankDiff === k ? 'act' : ''}" onclick="setBankDiff('${k}')">${k === 'all' ? '全部难度' : DIFF[k][0]}</span>`).join('');
+  const groupChips = ['all', ...groups].map(k => `<span class="chip ${bankGroup === k ? 'act' : ''}" onclick="setBankGroup('${k}')">${k === 'all' ? '全部分类' : k}</span>`).join('');
+  const stChips = ['all', 'todo', 'doing', 'ac', 'review'].map(k => `<span class="chip ${bankSt === k ? 'act' : ''}" onclick="setBankSt('${k}')">${k === 'all' ? '全部状态' : ST_CN[k]}</span>`).join('');
+
+  const items = list.map(q => {
+    const r = getRec(q.id);
+    return `<div class="q-item" onclick="openDetail(${q.id})">
+      <div class="q-no">#${q.id}</div>
+      <div class="q-main">
+        <div class="q-title">${esc(q.title)}</div>
+        <div class="q-meta"><span class="badge ${DIFF[q.difficulty][1]}">${DIFF[q.difficulty][0]}</span><span>${esc(q.group)}</span>${q.lists.length > 1 ? '<span class="badge b-st">双题单</span>' : ''}</div>
+      </div>
+      <div class="q-dot d-${r.st}" title="${ST_CN[r.st]}"></div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <input class="search" placeholder="搜索编号 / 标题…" value="${esc(bankKw)}" oninput="setBankKw(this.value)">
+    <div class="chips">${listChips}</div>
+    <div class="chips">${diffChips}</div>
+    <div class="chips">${groupChips}</div>
+    <div class="chips">${stChips}</div>
+    ${items || '<div class="empty">没有符合条件的题目</div>'}`;
+}
+function setBankList(v) { bankList = v; renderBank(); }
+function setBankDiff(v) { bankDiff = v; renderBank(); }
+function setBankGroup(v) { bankGroup = v; renderBank(); }
+function setBankSt(v) { bankSt = v; renderBank(); }
+function setBankKw(v) { bankKw = v.trim(); renderBank(); }
+
+/* ============ 详情面板 ============ */
+let curQ = null;
+function openDetail(id) {
+  curQ = qmap[id];
+  renderDetail();
+  document.getElementById('detailSheet').classList.add('on');
+  document.getElementById('mask').classList.add('on');
+}
+function renderDetail() {
+  const q = curQ, r = getRec(q.id);
+  document.getElementById('dIc').textContent = q.difficulty === 'Easy' ? 'E' : q.difficulty === 'Medium' ? 'M' : 'H';
+  document.getElementById('dIc').style.background = q.difficulty === 'Easy' ? 'var(--easy)' : q.difficulty === 'Medium' ? 'var(--medium)' : 'var(--hard)';
+  document.getElementById('dTitle').textContent = q.title;
+  document.getElementById('dMeta').textContent = `#${q.id} · ${q.group} · ${q.lists.map(l => LISTS[l]).join(' / ')}`;
+  document.getElementById('dLink').onclick = () => window.open('https://leetcode.cn/problems/' + q.slug + '/', '_blank');
+  const stBtns = ['todo', 'doing', 'ac', 'review'].map(k =>
+    `<div class="st-btn ${r.st === k ? 'act' : ''}" onclick="setDetailStatus('${k}')">${ST_CN[k]}</div>`).join('');
+  document.getElementById('dStatus').innerHTML = stBtns;
+  document.getElementById('dTiers').innerHTML = renderTiers(q.id);
+  document.getElementById('dEdit').style.display = 'block';
+}
+function setDetailStatus(k) {
+  setStatus(curQ.id, k);
+  toast(k === 'ac' ? '已标记 AC，记入打卡' : '状态已更新');
+  renderDetail(); renderBank();
+}
+function renderTiers(id) {
+  const q = qmap[id];
+  const sol = SOLUTIONS[id] || { t: ['', '', ''], c: ['', '', ''] };
+  const custom = state.sol && state.sol[id];
+  const t = custom ? custom.t : sol.t;
+  const c = custom ? custom.c : sol.c;
+  const names = ['简单 · 兜底', '中等 · 满分', '困难 · 极致'];
+  return t.map((idea, i) => `
+    <div class="tier">
+      <div class="tier-h" onclick="this.parentElement.classList.toggle('open')">
+        <span class="tg tg-${i + 1}">${i + 1}</span>
+        <span>${names[i]}</span>
+        <span class="arr">▾</span>
+      </div>
+      <div class="tier-b">
+        ${idea ? '<div>' + esc(idea) + '</div>' : '<div style="color:var(--gray);font-size:12px">（未填写，点击下方「编辑解法内容」补充）</div>'}
+        ${c[i] ? `<code>${esc(c[i])}</code>` : ''}
+      </div>
+    </div>`).join('');
+}
+document.getElementById('dEdit').onclick = () => openEdit();
+document.getElementById('mask').onclick = closeSheet;
+function closeSheet() {
+  document.getElementById('detailSheet').classList.remove('on');
+  document.getElementById('mask').classList.remove('on');
+}
+
+/* ============ 编辑解法 ============ */
+function openEdit() {
+  const id = curQ.id, q = qmap[id];
+  const custom = (state.sol && state.sol[id]) || null;
+  const base = SOLUTIONS[id] || { t: ['', '', ''], c: ['', '', ''] };
+  const t = custom ? custom.t : base.t;
+  const c = custom ? custom.c : base.c;
+  const html = `
+    <div style="font-size:15px;font-weight:700;margin-bottom:12px">编辑解法 · ${esc(q.title)}</div>
+    ${[0, 1, 2].map(i => `
+      <div style="margin-bottom:12px">
+        <div style="font-size:12px;color:var(--ink-2);margin-bottom:6px">第 ${i + 1} 阶 · 核心思想</div>
+        <textarea id="edT${i}" rows="2" style="width:100%;border:1px solid var(--gray-light);background:var(--bg);color:var(--ink);border-radius:10px;padding:9px;font-size:13px;outline:none;resize:vertical">${esc(t[i])}</textarea>
+        <div style="font-size:12px;color:var(--ink-2);margin:8px 0 6px">代码片段（可选）</div>
+        <textarea id="edC${i}" rows="3" style="width:100%;border:1px solid var(--gray-light);background:var(--bg);color:var(--ink);border-radius:10px;padding:9px;font-size:12px;outline:none;resize:vertical;font-family:ui-monospace,Consolas,monospace">${esc(c[i])}</textarea>
+      </div>`).join('')}
+    <button class="btn-primary" onclick="saveEdit()">保存</button>`;
+  const body = document.getElementById('detailSheet').querySelector('.sheet-body');
+  body.innerHTML = html;
+  document.getElementById('dEdit').style.display = 'none';
+}
+function saveEdit() {
+  const id = curQ.id;
+  state.sol = state.sol || {};
+  state.sol[id] = {
+    t: [0, 1, 2].map(i => document.getElementById('edT' + i).value),
+    c: [0, 1, 2].map(i => document.getElementById('edC' + i).value)
+  };
+  save();
+  toast('解法已保存');
+  renderDetail();
+}
+
+/* ============ 闪卡 ============ */
+let flashQueue = [], flashIdx = 0, flashRevealed = false;
+function openFlash(id) {
+  flashQueue = [id]; flashIdx = 0; flashRevealed = false;
+  document.getElementById('flash').classList.add('on');
+  renderFlash();
+}
+function openFlashAll() {
+  flashQueue = recommend().map(Number);
+  if (!flashQueue.length) { toast('暂无推荐，先去题库逛逛'); return; }
+  flashIdx = 0; flashRevealed = false;
+  document.getElementById('flash').classList.add('on');
+  renderFlash();
+}
+function renderFlash() {
+  const id = flashQueue[flashIdx], q = qmap[id];
+  flashRevealed = false;
+  document.getElementById('fCard').classList.remove('revealed');
+  document.getElementById('fMeta').innerHTML = `<span class="badge ${DIFF[q.difficulty][1]}">${DIFF[q.difficulty][0]}</span><span class="badge b-st">${esc(q.group)}</span>`;
+  document.getElementById('fTitle').textContent = q.title;
+  document.getElementById('fBack').innerHTML = renderTiers(id);
+  document.getElementById('flashProg').textContent = `${flashIdx + 1} / ${flashQueue.length}`;
+  document.getElementById('fCard').onclick = () => {
+    if (!flashRevealed) { flashRevealed = true; document.getElementById('fCard').classList.add('revealed'); }
+  };
+}
+function flashNext() {
+  flashIdx = (flashIdx + 1) % flashQueue.length;
+  renderFlash();
+}
+document.getElementById('fGood').onclick = () => { setStatus(flashQueue[flashIdx], 'ac'); toast('已掌握 ✓'); flashNext(); };
+document.getElementById('fRev').onclick = () => { setStatus(flashQueue[flashIdx], 'review'); toast('已加入待复习'); flashNext(); };
+document.getElementById('flashNext').onclick = flashNext;
+document.getElementById('flashClose').onclick = () => { document.getElementById('flash').classList.remove('on'); renderToday(); renderBank(); renderStats(); };
+
+/* ============ 统计页 ============ */
+function renderStats() {
+  const el = document.getElementById('pageStats');
+  const total = Object.keys(qmap).length;
+  const ac = acCount(), rev = reviewCount(), stk = streak(), tc = todayCount();
+  const easy = countByDiff('Easy'), med = countByDiff('Medium'), hard = countByDiff('Hard');
+  const byGroup = {};
+  Object.keys(qmap).forEach(id => { const q = qmap[id]; byGroup[q.group] = byGroup[q.group] || { ac: 0, all: 0 }; byGroup[q.group].all++; if (getRec(id).st === 'ac') byGroup[q.group].ac++; });
+  const groupTop = Object.entries(byGroup).sort((a, b) => b[1].ac - a[1].ac).slice(0, 8);
+  const months = last12Months();
+  const maxM = Math.max(1, ...months.map(m => m.count));
+
+  el.innerHTML = `
+    <div class="stat-grid">
+      <div class="stat"><div class="num">${ac}</div><div class="lb">已AC</div></div>
+      <div class="stat warn"><div class="num">${rev}</div><div class="lb">待复习</div></div>
+      <div class="stat"><div class="num">${stk}</div><div class="lb">连续天数</div></div>
+      <div class="stat"><div class="num">${tc}</div><div class="lb">今日</div></div>
+    </div>
+    <div class="card">
+      <div class="card-t">打卡热力图 <span class="more">近 12 周</span></div>
+      ${heatmapHtml()}
+    </div>
+    <div class="card">
+      <div class="card-t">难度分布</div>
+      ${barRow('简单', easy, ac, 'var(--easy)')}${barRow('中等', med, ac, 'var(--medium)')}${barRow('困难', hard, ac, 'var(--hard)')}
+      <div style="font-size:11px;color:var(--gray);margin-top:6px">共 ${ac} 题 AC · 题单总 ${total} 题</div>
+    </div>
+    <div class="card">
+      <div class="card-t">分类 TOP</div>
+      ${groupTop.map(([g, v]) => barRow(g, v.ac, ac, 'var(--primary)')).join('') || '<div class="empty">还没有 AC 记录</div>'}
+    </div>
+    <div class="card">
+      <div class="card-t">近 12 月趋势</div>
+      <div class="trend">${months.map(m => `
+        <div class="t-col">
+          <div class="t-bar ${m.count ? '' : 'z'}" style="height:${Math.max(3, m.count / maxM * 100)}%"></div>
+          <div class="t-lb">${m.label}</div>
+        </div>`).join('')}</div>
+    </div>`;
+}
+function countByDiff(d) { return Object.keys(qmap).filter(id => qmap[id].difficulty === d && getRec(id).st === 'ac').length; }
+function barRow(lb, val, max, color) {
+  return `<div class="bar-row"><div class="bar-lb">${lb}</div><div class="bar-track"><div class="bar-fill" style="width:${max ? Math.round(val / max * 100) : 0}%;background:${color}"></div></div><div class="bar-val">${val}</div></div>`;
+}
+function heatmapHtml() {
+  const set = state.checkins;
+  const cells = [];
+  const today = new Date();
+  const start = new Date(today); start.setDate(start.getDate() - 83);
+  const byDate = {};
+  Object.keys(set).forEach(d => byDate[d] = set[d].length);
+  for (let i = 0; i < 84; i++) {
+    const d = new Date(start); d.setDate(start.getDate() + i);
+    const n = byDate[fmt(d)] || 0;
+    cells.push(`<div class="hm-cell ${n ? 'hm-' + Math.min(4, n) : ''}"></div>`);
+  }
+  const weekLb = ['12周前', '8周前', '4周前', '本周'];
+  return `<div class="hm-wrap"><div class="heatmap">${cells.join('')}</div></div>
+    <div class="hm-axis">${weekLb.map(w => '<span>' + w + '</span>').join('')}</div>
+    <div class="hm-lv"><span>少</span><div class="hm-cell"></div><div class="hm-cell hm-1"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-4"></div><span>多</span></div>`;
+}
+function last12Months() {
+  const out = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    let count = 0;
+    Object.keys(state.checkins).forEach(ds => { if (ds.startsWith(key)) count += state.checkins[ds].length; });
+    out.push({ label: String(d.getMonth() + 1) + '月', count });
+  }
+  return out;
+}
+
+/* ============ Toast ============ */
+let toastTimer = null;
+function toast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; t.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:9px 18px;border-radius:99px;font-size:13px;z-index:300;transition:opacity .25s;pointer-events:none;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.style.opacity = '0', 1600);
+}
+
+/* ============ 初始化 ============ */
+renderToday();
+renderBank();
+renderStats();
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+</script>
+</body>
+</html>
