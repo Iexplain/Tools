@@ -1257,7 +1257,7 @@ function exportICS(dateStr) {
     'END:VCALENDAR'
   ].join('\r\n');
   const ics = lines;
-  const filename = '面试_' + dateStr + '.ics';
+  const filename = `interview-${dateStr}.ics`;  // 纯英文文件名，iOS/PWA 兼容性更好
   // 优先 Web Share API：iOS/安卓会弹系统分享面板，选「日历」即可添加
   if (navigator.canShare) {
     try {
@@ -1270,15 +1270,9 @@ function exportICS(dateStr) {
       }
     } catch (e) { /* 不支持则走下载 */ }
   }
-  // 回退：data URL 下载
+  // 回退：data URL 下载（保存到文件 App）
   download(filename, ics, 'text/calendar;charset=utf-8');
-  const isIOSPWA = window.navigator.standalone === true;
-  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-  if (isIOSPWA || isIOS) {
-    toast('已下载 .ics：去「文件」App → 找到文件 → 选「日历」打开');
-  } else {
-    toast('已下载 .ics 文件，双击或用日历 App 打开即可');
-  }
+  toast('已保存到「文件」App：找到该 .ics → 轻点 → 点右下角「添加」');
 }
 
 /* ================= Offer 对比 ================= */
