@@ -1,5 +1,5 @@
 /* 我的小工具（入口页） - Service Worker */
-const CACHE = 'tools-launcher-v1';
+const CACHE = 'tools-launcher-v2';
 /* 缓存是按「域名」共享的，不是按目录隔离的：清理旧缓存时只能删自己这个前缀的，
    否则会把各个子应用的缓存一起删掉，害它们离线打不开。 */
 const PREFIX = 'tools-launcher-';
