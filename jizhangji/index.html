@@ -1199,7 +1199,7 @@ function renderChips() {
       ${c.dot ? `<span class="dot" style="background:${c.dot}"></span>` : ''}${c.label}
       <span style="opacity:.75;margin-left:2px">${counts[c.k] || ''}</span>
     </button>`).join('');
-  chipsEl.querySelectorAll('.chip').forEach(c => c.onclick = () => { filter = c.dataset.k; renderList(); });
+  chipsEl.querySelectorAll('.chip').forEach(c => c.onclick = () => { filter = c.dataset.k; renderChips(); renderList(); });
 }
 
 /* ================= 列表 ================= */
