@@ -812,7 +812,7 @@ function renderList() {
       e.stopPropagation();
       const id = btn.closest('.card').dataset.id;
       const act = btn.dataset.act;
-      if (act === 'advance') advanceStatus(id);
+      if (act === 'advance') openStMenu(id, true);
       else if (act === 'reject') rejectRecord(id);
       else if (act === 'decline') declineOffer(id);
       else if (act === 'edit') openEditor(id);
@@ -865,31 +865,12 @@ function cardHTML(r) {
     ${todosHTML}
     ${hasReview ? `<span class="review-pill">📝 已复盘</span>` : ''}
     <div class="actions">
-      ${isActive ? `<button class="btn primary" data-act="advance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>${nextBtnLabel(r.status)}</button><button class="btn danger" data-act="reject">未通过</button>` : ''}
+      ${isActive ? `<button class="btn primary" data-act="advance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>推进 ▾</button><button class="btn danger" data-act="reject">未通过</button>` : ''}
       ${isOffer ? `<button class="btn danger" data-act="decline">拒Offer</button>` : ''}
       <button class="btn ghost" data-act="edit">编辑</button>
       ${isEnd ? `<button class="btn danger" data-act="delete">删除</button>` : ''}
     </div>
   </div>`;
-}
-function nextBtnLabel(st) {
-  if (st === 'submitted') return '进入筛选';
-  if (st === 'screening') return '进入一面';
-  if (st === 'interview1') return '进入二面';
-  if (st === 'interview2') return '进入三面';
-  if (st === 'interview3') return '进入HR面';
-  if (st === 'hr') return '标记 Offer';
-  return '推进进度';
-}
-function advanceStatus(id) {
-  const r = records.find(x => x.id === id);
-  if (!r) return;
-  const i = STATUS_ORDER.indexOf(r.status);
-  if (i < 0 || i >= STATUS_ORDER.length - 2) return;
-  r.status = STATUS_ORDER[i + 1];
-  r.updatedAt = Date.now();
-  save(); renderAll();
-  toast(`已推进到「${STATUS[r.status].label}」`);
 }
 function rejectRecord(id) {
   const r = records.find(x => x.id === id);
@@ -1303,13 +1284,21 @@ function renderCompare() {
   });
 }
 
-/* ================= 状态快捷切换 ================= */
-function openStMenu(id) {
+/* ================= 状态快捷切换 / 推进菜单 ================= */
+function openStMenu(id, advanceOnly) {
   const r = records.find(x => x.id === id);
   if (!r) return;
   stMenuId = id;
-  document.getElementById('stMenuTitle').textContent = '切换「' + r.company + '」的状态';
-  document.getElementById('stMenuGrid').innerHTML = STATUS_ORDER.map(k => {
+  // 推进模式：只列出当前状态之后的目标（支持跳过轮次，如二面直接进 HR面）
+  const curIdx = STATUS_ORDER.indexOf(r.status);
+  const list = advanceOnly
+    ? STATUS_ORDER.filter((k, i) => i > curIdx && k !== 'declined' && k !== 'rejected')
+    : STATUS_ORDER;
+  if (!list.length) { toast('当前状态没有可推进的目标'); return; }
+  document.getElementById('stMenuTitle').textContent = advanceOnly
+    ? '推进「' + r.company + '」到：'
+    : '切换「' + r.company + '」的状态';
+  document.getElementById('stMenuGrid').innerHTML = list.map(k => {
     const st = STATUS[k];
     return `<button class="st-opt ${k === r.status ? 'cur' : ''}" data-k="${k}" style="${k === r.status ? 'background:' + st.color : ''}">${st.label}</button>`;
   }).join('');
