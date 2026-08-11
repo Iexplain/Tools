@@ -716,7 +716,7 @@
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z"/><path d="M18 9l-6 6M12 9l6 6"/></svg>
           </button>
         </div>
-        <button class="kp-btn confirm" id="kpConfirm" style="grid-column:1/-1">保存</button>
+        <button class="kp-btn confirm" id="kpConfirm" style="grid-column:1/-1">完成 ✓</button>
       </div>
     </div>
 
@@ -1631,7 +1631,11 @@ document.getElementById('fAmount').onclick = (e) => {
 };
 document.querySelectorAll('.kp-btn[data-k]').forEach(b => b.onclick = () => kpInput(b.dataset.k));
 document.getElementById('kpDel').onclick = kpDel;
-document.getElementById('kpConfirm').onclick = () => { hideKeypad(); saveEditor(); };
+document.getElementById('kpConfirm').onclick = () => {
+  hideKeypad();
+  // 收起键盘后让用户继续填写备注等字段（聚焦到备注输入框，调起系统键盘）
+  setTimeout(() => document.getElementById('fNote').focus({ preventScroll: true }), 150);
+};
 
 /* GitHub 同步 */
 document.getElementById('optGithub').onclick = () => {
