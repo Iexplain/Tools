@@ -1035,8 +1035,8 @@ function renderDonut(type) {
 }
 
 function renderTrend() {
-  const months = [];
-  for (let i = 11; i >= 0; i--) months.unshift(shiftMonth(viewMonth, -i));
+  // 12 个月数据，从最旧到最新（升序）
+  const months = Array.from({ length: 12 }, (_, k) => shiftMonth(viewMonth, k - 11));
   const data = months.map(m => {
     const list = records.filter(r => (r.date || '').slice(0, 7) === m);
     let inc = 0, exp = 0;
