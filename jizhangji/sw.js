@@ -1,5 +1,5 @@
 /* 记账本 - Service Worker */
-const CACHE = 'account-book-v16';
+const CACHE = 'account-book-v17';
 /* 缓存是按「域名」共享的，不是按目录隔离的：清理旧缓存时只能删自己这个前缀的，
    否则会把同仓库其他应用（求职录、入口页）的缓存一起删掉，害它们离线打不开。 */
 const PREFIX = 'account-book-';
