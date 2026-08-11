@@ -1011,7 +1011,6 @@ function renderDonutCard() {
         </div>
       </div>
       ${renderDonut(chartTab)}
-      <div class="donut-tip">💡 点环形图切片筛选下方明细 · 再点一次或点中心还原</div>
     </div>`;
   box.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { chartTab = b.dataset.tab; renderDonutCard(); });
   // 切片联动：点击筛选该分类，再点/点中心还原
