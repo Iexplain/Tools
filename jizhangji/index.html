@@ -1082,10 +1082,6 @@ function renderTrend() {
     bars.push(`<rect x="${xInc.toFixed(1)}" y="${yInc.toFixed(1)}" width="${barW}" height="${Math.max(incH, 0).toFixed(1)}" fill="var(--income)" rx="2" />`);
     const monthNum = i + 1;
     const isCurrent = monthNum === m;
-    // 当前月在柱底加一根品牌色短线作视觉锚点（不与红绿柱撞色）
-    if (isCurrent) {
-      bars.push(`<line x1="${(cx - groupW * 0.4).toFixed(1)}" y1="${(pad.t + ch + 2).toFixed(1)}" x2="${(cx + groupW * 0.4).toFixed(1)}" y2="${(pad.t + ch + 2).toFixed(1)}" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" />`);
-    }
     // 当前月用最深灰 + 800 加粗（避免与红/绿柱撞色），其他月用浅灰 + 500
     bars.push(`<text x="${cx.toFixed(1)}" y="${(H - pad.b + 16).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="${isCurrent ? '800' : '500'}" fill="${isCurrent ? 'var(--ink)' : 'var(--ink-2)'}">${monthNum}月</text>`);
   });
