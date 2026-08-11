@@ -1049,10 +1049,12 @@ function renderTrend() {
   const max = niceMax(maxRaw);
   const hasData = data.some(d => d.inc || d.exp);
 
-  const W = 320, H = 170, pad = { l: 38, r: 8, t: 14, b: 28 };
+  // 绘图区：左右边距收紧（l 38→30 只留 Y 轴标签空间，r 8→4 贴边），让 1月/12月贴近卡片边缘
+  const W = 320, H = 170, pad = { l: 30, r: 4, t: 14, b: 28 };
   const cw = W - pad.l - pad.r, ch = H - pad.t - pad.b;
   const groupW = cw / data.length;
-  const barW = Math.min(11, (groupW - 8) / 2);
+  // 柱宽调粗：组内预留空隙 8→4，上限 11→12，类目占比提升到 ~85%
+  const barW = Math.min(12, (groupW - 4) / 2);
   const gap = 3;
 
   // 网格 + Y 轴标签
