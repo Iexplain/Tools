@@ -973,7 +973,7 @@ function renderCharts() {
     </div>
     <div class="chart-card">
       <div class="ch-title">
-        <h2>近 12 个月收支</h2>
+        <h2>全年收支</h2>
         <div class="legend-mini">
           <span><span class="dot e"></span>支出</span>
           <span><span class="dot i"></span>收入</span>
@@ -1035,13 +1035,14 @@ function renderDonut(type) {
 }
 
 function renderTrend() {
-  // 12 个月数据，从最旧到最新（升序）
-  const months = Array.from({ length: 12 }, (_, k) => shiftMonth(viewMonth, k - 11));
-  const data = months.map(m => {
-    const list = records.filter(r => (r.date || '').slice(0, 7) === m);
+  // 按自然年显示：viewMonth 所在年份的 1-12 月
+  const [y, m] = viewMonth.split('-').map(Number);
+  const months = Array.from({ length: 12 }, (_, k) => `${y}-${String(k + 1).padStart(2, '0')}`);
+  const data = months.map(ym => {
+    const list = records.filter(r => (r.date || '').slice(0, 7) === ym);
     let inc = 0, exp = 0;
     list.forEach(r => { const a = Number(r.amount) || 0; if (r.type === 'income') inc += a; else exp += a; });
-    return { m, inc, exp, total: inc + exp };
+    return { m: ym, inc, exp, total: inc + exp };
   });
 
   const maxRaw = Math.max(1, ...data.flatMap(d => [d.inc, d.exp]));
@@ -1065,7 +1066,7 @@ function renderTrend() {
     gridLines.push(`<text x="${(pad.l - 4).toFixed(1)}" y="${(y + 3).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--gray)">${shortMoney(v)}</text>`);
   }
 
-  // 柱子 + X 轴标签
+  // 柱子 + X 轴标签：1-12 月全部显示
   const bars = [];
   data.forEach((d, i) => {
     const cx = pad.l + groupW * i + groupW / 2;
@@ -1077,11 +1078,10 @@ function renderTrend() {
     const yInc = pad.t + ch - incH;
     bars.push(`<rect x="${xExp.toFixed(1)}" y="${yExp.toFixed(1)}" width="${barW}" height="${Math.max(expH, 0).toFixed(1)}" fill="var(--primary)" rx="2" />`);
     bars.push(`<rect x="${xInc.toFixed(1)}" y="${yInc.toFixed(1)}" width="${barW}" height="${Math.max(incH, 0).toFixed(1)}" fill="var(--income)" rx="2" />`);
-    const isCurrent = d.m === viewMonth;
-    // 12 个月标签太密，每隔 1 个显示一次（当前月始终显示）
-    if (isCurrent || i % 2 === 0) {
-      bars.push(`<text x="${cx.toFixed(1)}" y="${(H - pad.b + 16).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="${isCurrent ? '700' : '400'}" fill="${isCurrent ? 'var(--ink)' : 'var(--ink-2)'}">${parseInt(d.m.split('-')[1], 10)}月</text>`);
-    }
+    const monthNum = i + 1;
+    const isCurrent = monthNum === m;
+    // 每月都显示标签，字号小一点（10→9）；当前月加粗品牌色
+    bars.push(`<text x="${cx.toFixed(1)}" y="${(H - pad.b + 16).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="${isCurrent ? '800' : '500'}" fill="${isCurrent ? 'var(--primary-dark)' : 'var(--ink-2)'}">${monthNum}月</text>`);
   });
 
   const totalExp = data.reduce((s, d) => s + d.exp, 0);
@@ -1089,10 +1089,10 @@ function renderTrend() {
 
   return `
     <svg class="trend-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
-      ${hasData ? gridLines.join('') + bars.join('') : `<text x="${W / 2}" y="${H / 2}" text-anchor="middle" font-size="13" fill="var(--gray)">近 12 个月暂无数据</text>`}
+      ${hasData ? gridLines.join('') + bars.join('') : `<text x="${W / 2}" y="${H / 2}" text-anchor="middle" font-size="13" fill="var(--gray)">${y} 年暂无数据</text>`}
     </svg>
     <div class="trend-tip">
-      <span>全年合计：<span class="t-out">-${fmtMoney(totalExp)}</span> · <span class="t-in">+${fmtMoney(totalInc)}</span></span>
+      <span>${y} 年合计：<span class="t-out">-${fmtMoney(totalExp)}</span> · <span class="t-in">+${fmtMoney(totalInc)}</span></span>
       <span>结余 <b>${(totalInc - totalExp) >= 0 ? '+' : ''}${fmtMoney(totalInc - totalExp)}</b></span>
     </div>`;
 }
