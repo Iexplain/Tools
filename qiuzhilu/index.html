@@ -351,18 +351,30 @@
   /* ===== 看板 ===== */
   .kanban { display: flex; flex-direction: column; gap: 12px; }
   .kanban-col {
-    background: var(--card); border-radius: var(--radius); padding: 12px;
-    box-shadow: var(--shadow);
+    background: var(--card); border-radius: var(--radius); padding: 6px 12px;
+    box-shadow: var(--shadow); overflow: hidden;
   }
   .kanban-col .col-head {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px; padding: 10px 0;
+    cursor: pointer; -webkit-user-select: none; user-select: none;
   }
-  .kanban-col .col-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .kanban-col .col-head:active { opacity: .7; }
+  .kanban-col .col-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .kanban-col .col-title { font-size: 14px; font-weight: 800; }
   .kanban-col .col-count {
     font-size: 11px; color: var(--ink-2); background: var(--gray-light);
     padding: 2px 8px; border-radius: 10px; margin-left: auto;
   }
+  .kanban-col .col-arrow {
+    width: 16px; height: 16px; color: var(--gray); flex-shrink: 0;
+    transition: transform .25s ease;
+  }
+  .kanban-col.collapsed .col-arrow { transform: rotate(-90deg); }
+  .kanban-col .col-body {
+    max-height: 2000px; opacity: 1; overflow: hidden;
+    transition: max-height .3s ease, opacity .2s ease;
+  }
+  .kanban-col.collapsed .col-body { max-height: 0; opacity: 0; }
   .kanban-card {
     background: #fff; border: 1px solid var(--gray-light); border-radius: 14px;
     padding: 10px 12px; margin-bottom: 8px; cursor: pointer; transition: transform .12s;
@@ -711,6 +723,7 @@ let editingId = null;
 let viewMode = 'list';   // list / kanban / calendar / compare
 let calMonth = '';       // 日历当前月 YYYY-MM
 let stMenuId = null;     // 状态快捷菜单对应的记录
+let kanbanCollapsed = {}; // 看板手风琴折叠状态 { 列key: true折叠 }
 
 function load() {
   try { records = JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
@@ -1076,16 +1089,29 @@ function renderKanban() {
   const list = document.getElementById('list');
   list.innerHTML = KANBAN_COLS.map(col => {
     const items = records.filter(r => col.statuses.includes(r.status));
+    const isCollapsed = !!kanbanCollapsed[col.k];
     return `
-    <div class="kanban-col">
+    <div class="kanban-col ${isCollapsed ? 'collapsed' : ''}" data-col="${col.k}">
       <div class="col-head">
         <span class="col-dot" style="background:${col.color}"></span>
         <span class="col-title">${col.label}</span>
         <span class="col-count">${items.length}</span>
+        <svg class="col-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
       </div>
-      ${items.length ? items.map(kcCardHTML).join('') : `<div class="kanban-empty">暂无记录</div>`}
+      <div class="col-body">
+        ${items.length ? items.map(kcCardHTML).join('') : `<div class="kanban-empty">暂无记录</div>`}
+      </div>
     </div>`;
   }).join('');
+  // 点击标题栏 → 手风琴折叠/展开
+  list.querySelectorAll('.col-head').forEach(head => {
+    head.onclick = () => {
+      const col = head.closest('.kanban-col');
+      const k = col.dataset.col;
+      kanbanCollapsed[k] = !kanbanCollapsed[k];
+      col.classList.toggle('collapsed', kanbanCollapsed[k]);
+    };
+  });
   list.querySelectorAll('.kanban-card').forEach(card => {
     card.onclick = (e) => {
       if (e.target.closest('.kc-st')) return;
