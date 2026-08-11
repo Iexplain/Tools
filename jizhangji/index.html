@@ -577,10 +577,6 @@
   .donut-seg {
     transition: filter .3s ease, stroke-width .3s ease;
   }
-  /* 选中：深色立体阴影（凸起悬浮感）*/
-  .donut-seg.act {
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,.35));
-  }
 
   /* ===== 消费排行榜 ===== */
   .max-card { display: flex; align-items: center; gap: 12px; background: var(--surface-2); border-radius: 14px; padding: 14px; }
@@ -1022,13 +1018,12 @@ function renderDonut(type) {
     key: k, amt: groups[k], count: countMap[k], cat: getCat(type, k), pct: groups[k] / total
   })).sort((a, b) => b.amt - a.amt);
 
-  const R = 48, C = 2 * Math.PI * R;
-  const strokeW = 96;  // 实心饼图：stroke-width 填满整个圆 (R*2)
+  const R = 27.5, C = 2 * Math.PI * R;
+  const strokeW = 55;  // 实心饼图：stroke-width = 2R，内半径0 外半径55，完整内切于画布
   // 保证每个最小可见段 2px
   const minSeg = 2 / C;
   const segs = [];
   let acc = 0;
-  let activeSeg = null;  // 记录选中扇区信息用于 tooltip 定位
 
   items.forEach((it, i) => {
     let p = it.pct;
@@ -1039,25 +1034,25 @@ function renderDonut(type) {
     acc += p;
 
     const isActive = filter === it.key;
-    // 扇区中点角度（12 点方向起，顺时针，单位弧度）
-    const angle = (acc - p / 2) * 2 * Math.PI - Math.PI / 2;
-    let dx = 0, dy = 0;
-    let transform = 'rotate(-90 60 60)';
-    if (isActive) {
-      // 沿圆心放射方向外凸 12px；用 SVG 属性 transform 平移+旋转
-      // 矩阵推导：translate(dy, -dx) rotate(-90 60 60) → 等效于"在原坐标系中向 (dx,dy) 外凸"
-      dx = 12 * Math.cos(angle);
-      dy = 12 * Math.sin(angle);
-      transform = `translate(${dy.toFixed(2)} ${(-dx).toFixed(2)}) rotate(-90 60 60)`;
-      activeSeg = { ...it, angle, dx, dy };
-    }
 
     segs.push(`<circle cx="60" cy="60" r="${R}" fill="none" stroke="${it.cat.color}" stroke-width="${strokeW}"
       stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}"
       stroke-dashoffset="${offset.toFixed(2)}"
-      transform="${transform}"
+      transform="rotate(-90 60 60)"
       class="donut-seg ${isActive ? 'act' : ''}" data-key="${it.key}"
       style="cursor:pointer" />`);
+
+    if (isActive) {
+      // 外圈高亮环：r=58 宽 4（覆盖 56~60），紧贴饼图外边缘(55)，同色半透明 + 微光
+      const rRing = 58, cRing = 2 * Math.PI * rRing;
+      segs.push(`<circle cx="60" cy="60" r="${rRing}" fill="none" stroke="${it.cat.color}" stroke-width="4"
+        stroke-opacity="0.55"
+        stroke-dasharray="${(cRing * p).toFixed(2)} ${(cRing * (1 - p)).toFixed(2)}"
+        stroke-dashoffset="${offset.toFixed(2)}"
+        transform="rotate(-90 60 60)"
+        class="donut-seg donut-ring" data-key="${it.key}"
+        style="cursor:pointer; filter: drop-shadow(0 0 3px ${it.cat.color})" />`);
+    }
   });
 
   const top = items.slice(0, 5);
