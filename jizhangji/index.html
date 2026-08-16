@@ -1222,10 +1222,11 @@ function renderDonutCard() {
   // 自动选择有数据的 tab
   if (chartTab === 'expense' && !expList.length) chartTab = 'income';
   else if (chartTab === 'income' && !incList.length) chartTab = 'expense';
+  const word = viewMode === 'day' ? '今日' : '本月';
   box.innerHTML = `
     <div class="chart-card">
       <div class="ch-title">
-        <h2 id="donutTitle">本月分类占比</h2>
+        <h2 id="donutTitle">${word}分类占比</h2>
         <div class="toggle">
           <button class="${chartTab === 'expense' ? 'active' : ''}" data-tab="expense">支出</button>
           <button class="${chartTab === 'income' ? 'active' : ''}" data-tab="income">收入</button>
