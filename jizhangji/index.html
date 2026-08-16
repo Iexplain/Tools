@@ -342,6 +342,78 @@
     font-size: 15px; font-weight: 600; color: var(--ink); cursor: pointer; margin-bottom: 8px;
     text-align: left; font-family: inherit;
   }
+
+  /* ===== mode-switch 月/日切换 ===== */
+  .mode-switch {
+    display: inline-flex; background: var(--gray-light); border-radius: 10px;
+    padding: 2px; font-size: 12px; margin-left: 6px;
+  }
+  .mode-switch button {
+    border: none; background: transparent; padding: 4px 12px;
+    border-radius: 8px; cursor: pointer; color: var(--gray);
+    font-weight: 700; font-family: inherit;
+  }
+  .mode-switch button.act { background: var(--primary); color: #fff; }
+
+  /* ===== date-picker ===== */
+  .date-picker { display: none; }
+  .date-picker.show { display: block; position: fixed; inset: 0; z-index: 130; }
+  .date-picker .mask { position: absolute; inset: 0; background: rgba(31, 41, 55, .35); }
+  .date-picker .sheet {
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px; background: var(--card);
+    border-radius: 24px 24px 0 0; padding: 20px 18px calc(20px + var(--safe-bottom));
+    animation: slideup .25s;
+    max-height: 85vh; overflow-y: auto;
+  }
+  .date-picker .grab {
+    width: 40px; height: 4px; border-radius: 2px;
+    background: var(--gray-light); margin: 0 auto 14px;
+  }
+  .dp-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .dp-head .nav { display: flex; gap: 4px; align-items: center; }
+  .dp-head .nav button {
+    border: none; background: var(--gray-light);
+    width: 32px; height: 32px; border-radius: 10px;
+    cursor: pointer; color: var(--ink-2); font-size: 18px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .dp-head .nav button:active { background: var(--gray); }
+  .dp-head .ym { font-size: 17px; font-weight: 800; padding: 0 8px; }
+  .dp-today {
+    border: none; background: var(--primary-light); color: var(--primary);
+    padding: 6px 12px; border-radius: 10px; cursor: pointer;
+    font-size: 12px; font-weight: 700; font-family: inherit;
+  }
+  .dp-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    margin-bottom: 6px;
+  }
+  .dp-grid button {
+    border: none; background: var(--gray-light);
+    padding: 14px 4px; border-radius: 12px; cursor: pointer;
+    font-weight: 700; color: var(--ink-2); font-family: inherit; font-size: 14px;
+  }
+  .dp-grid button.act { background: var(--primary); color: #fff; }
+  .dp-grid button.now { box-shadow: inset 0 0 0 2px var(--primary); }
+  .dp-grid button:disabled { opacity: .3; cursor: not-allowed; }
+  .dp-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .dp-cal .dh {
+    text-align: center; font-size: 11px; color: var(--gray);
+    padding: 6px 0; font-weight: 600;
+  }
+  .dp-cal button {
+    border: none; background: transparent; padding: 10px 0; border-radius: 10px;
+    cursor: pointer; font-weight: 600; color: var(--ink-2); font-family: inherit;
+    font-size: 14px;
+  }
+  .dp-cal button.act { background: var(--primary); color: #fff; }
+  .dp-cal button.now { box-shadow: inset 0 0 0 2px var(--primary); color: var(--primary); }
+  .dp-cal button.dim { color: var(--gray-light); }
+  .dp-cal button:disabled { opacity: .25; cursor: not-allowed; }
   .export-menu .opt svg { width: 20px; height: 20px; flex-shrink: 0; }
   .export-menu .opt small { display: block; font-size: 12px; color: var(--ink-2); font-weight: 400; margin-top: 2px; }
 
@@ -620,16 +692,22 @@
       <button id="prevMonth1" aria-label="上个月">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
-      <div class="current" id="currentMonth1"></div>
+      <div class="current" id="currentMonth1" style="gap:8px">
+        <span id="currentLabel1"></span>
+        <div class="mode-switch">
+          <button data-mode="month" class="act">月</button>
+          <button data-mode="day">日</button>
+        </div>
+      </div>
       <button id="nextMonth1" aria-label="下个月">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
       </button>
     </div>
 
     <div class="stats">
-      <div class="stat-card"><div class="num income" id="stIncome">¥0</div><div class="lbl">本月收入</div></div>
-      <div class="stat-card"><div class="num expense" id="stExpense">¥0</div><div class="lbl">本月支出</div></div>
-      <div class="stat-card"><div class="num balance" id="stBalance">¥0</div><div class="lbl">本月结余</div></div>
+      <div class="stat-card"><div class="num income" id="stIncome">¥0</div><div class="lbl" id="stIncomeLbl">本月收入</div></div>
+      <div class="stat-card"><div class="num expense" id="stExpense">¥0</div><div class="lbl" id="stExpenseLbl">本月支出</div></div>
+      <div class="stat-card"><div class="num balance" id="stBalance">¥0</div><div class="lbl" id="stBalanceLbl">本月结余</div></div>
     </div>
 
     <div id="donutBox"></div>
@@ -659,7 +737,7 @@
       <button id="prevMonth2" aria-label="上个月">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
-      <div class="current" id="currentMonth2"></div>
+      <div class="current" id="currentMonth2"><span id="currentLabel2"></span></div>
       <button id="nextMonth2" aria-label="下个月">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
       </button>
@@ -783,6 +861,15 @@
   </div>
 </div>
 
+<!-- 日期选择器（按月 / 按日） -->
+<div class="date-picker" id="datePicker">
+  <div class="mask" id="datePickerMask"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <div id="dpContent"></div>
+  </div>
+</div>
+
 <!-- GitHub 同步设置 -->
 <div class="modal-mask" id="githubMask">
   <div class="modal">
@@ -856,6 +943,8 @@ const STORE_KEY = 'accountBook.v1';
 let records = [];
 let editingId = null;
 let viewMonth = '';        // 当前查看的月份 YYYY-MM
+let viewMode = 'month';    // 'month' 整月 / 'day' 单日（仅明细页生效）
+let viewDate = '';         // 当前查看的日期 YYYY-MM-DD（day 模式用）
 let filter = 'all';        // all / expense / income / 分类 id
 let chartTab = 'expense';  // 环形图 tab: expense / income
 let editType = 'expense';  // 编辑器中的当前类型
@@ -881,6 +970,15 @@ function nowMonth() {
 function monthLabel(yyyymm) {
   const [y, m] = yyyymm.split('-');
   return y + ' 年 ' + parseInt(m, 10) + ' 月';
+}
+function dayLabel(yyyymmdd) {
+  const [y, m, d] = yyyymmdd.split('-');
+  return y + ' 年 ' + parseInt(m, 10) + ' 月 ' + parseInt(d, 10) + ' 日';
+}
+function shiftDay(yyyymmdd, delta) {
+  const [y, m, d] = yyyymmdd.split('-').map(Number);
+  const dt = new Date(y, m - 1, d + delta);
+  return dt.getFullYear() + '-' + pad(dt.getMonth() + 1) + '-' + pad(dt.getDate());
 }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function getCat(type, key) {
@@ -914,19 +1012,165 @@ function save() {
   localStorage.setItem(STORE_KEY, JSON.stringify(records));
 }
 
-/* ================= 月份切换 ================= */
+/* ================= 月份/日期切换 ================= */
 function renderMonth() {
-  const isNow = viewMonth === nowMonth();
-  ['currentMonth1', 'currentMonth2'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = monthLabel(viewMonth) + (isNow ? '' : '  ›');
-    el.classList.toggle('no-month', !isNow);
+  // 明细页 (currentMonth1) 根据 viewMode 显示月或日；统计页 (currentMonth2) 始终按月
+  const isNowMonth = viewMonth === nowMonth();
+  const isNowDate = viewDate === todayStr();
+  const label1 = viewMode === 'day' ? dayLabel(viewDate) : monthLabel(viewMonth);
+  const arrow1Disabled = viewMode === 'day' ? (viewDate >= todayStr()) : isNowMonth;
+
+  const lbl1 = document.getElementById('currentLabel1');
+  if (lbl1) {
+    lbl1.textContent = label1 + ((viewMode === 'day' ? !isNowDate : !isNowMonth) ? '  ›' : '');
+  }
+  const lbl2 = document.getElementById('currentLabel2');
+  if (lbl2) {
+    lbl2.textContent = monthLabel(viewMonth) + (!isNowMonth ? '  ›' : '');
+  }
+
+  const n1 = document.getElementById('nextMonth1');
+  if (n1) { n1.disabled = arrow1Disabled; n1.style.opacity = arrow1Disabled ? .35 : 1; }
+  const n2 = document.getElementById('nextMonth2');
+  if (n2) { n2.disabled = isNowMonth; n2.style.opacity = isNowMonth ? .35 : 1; }
+
+  // mode-switch 状态
+  document.querySelectorAll('#currentMonth1 .mode-switch button').forEach(b => {
+    b.classList.toggle('act', b.dataset.mode === viewMode);
   });
-  ['nextMonth1', 'nextMonth2'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) { el.disabled = isNow; el.style.opacity = isNow ? .35 : 1; }
-  });
+
+  // 明细页内的「本月/今日」文案同步
+  const word = viewMode === 'day' ? '今日' : '本月';
+  const stI = document.getElementById('stIncomeLbl');
+  const stE = document.getElementById('stExpenseLbl');
+  const stB = document.getElementById('stBalanceLbl');
+  if (stI) stI.textContent = word + '收入';
+  if (stE) stE.textContent = word + '支出';
+  if (stB) stB.textContent = word + '结余';
+  const lt = document.getElementById('listTitle');
+  if (lt) lt.textContent = word + '明细';
+  const dc = document.getElementById('donutTitle');
+  if (dc) dc.textContent = word + '分类占比';
+}
+
+/* ================= 日期选择器 Picker ================= */
+let pickerYear = 0, pickerMonth = 0;  // picker 内部用的临时年月
+
+function openDatePicker() {
+  if (viewMode === 'day') openDayPicker();
+  else openMonthPicker();
+}
+function openMonthPicker() {
+  const [y, m] = viewMonth.split('-').map(Number);
+  pickerYear = y; pickerMonth = m;
+  renderMonthPicker();
+  document.getElementById('datePicker').classList.add('show');
+}
+function openDayPicker() {
+  const [y, m] = viewDate.split('-').map(Number);
+  pickerYear = y; pickerMonth = m;
+  renderDayPicker();
+  document.getElementById('datePicker').classList.add('show');
+}
+function closeDatePicker() {
+  document.getElementById('datePicker').classList.remove('show');
+}
+function renderMonthPicker() {
+  const todayY = new Date().getFullYear();
+  const nowM = new Date().getMonth() + 1;
+  document.getElementById('dpContent').innerHTML = `
+    <div class="dp-head">
+      <div class="nav">
+        <button onclick="dpShiftPickerYear(-1)" ${pickerYear <= 2020?'disabled':''}>‹</button>
+        <div class="ym">${pickerYear} 年</div>
+        <button onclick="dpShiftPickerYear(1)" ${pickerYear >= 2099?'disabled':''}>›</button>
+      </div>
+      <button class="dp-today" onclick="dpJumpMonth()">回到本月</button>
+    </div>
+    <div class="dp-grid">
+      ${Array.from({length: 12}, (_, i) => {
+        const mm = i + 1;
+        const yyyymm = pickerYear + '-' + pad(mm);
+        const isAct = viewMonth === yyyymm;
+        const isNow = pickerYear === todayY && mm === nowM;
+        const isFuture = pickerYear > todayY || (pickerYear === todayY && mm > nowM);
+        return `<button class="${isAct?'act':''} ${isNow && !isAct?'now':''}"
+          ${isFuture?'disabled':''}
+          onclick="dpPickMonth('${yyyymm}')">${mm} 月</button>`;
+      }).join('')}
+    </div>`;
+}
+function renderDayPicker() {
+  const today = new Date();
+  const todayY = today.getFullYear(), todayM = today.getMonth() + 1, todayD = today.getDate();
+  const isNowMonth = (pickerYear === todayY && pickerMonth === todayM);
+  const first = new Date(pickerYear, pickerMonth - 1, 1);
+  const lastDay = new Date(pickerYear, pickerMonth, 0).getDate();
+  const startOffset = (first.getDay() + 6) % 7;  // 周一开头
+  const cells = [];
+  const prevLastDay = new Date(pickerYear, pickerMonth - 1, 0).getDate();
+  for (let i = startOffset - 1; i >= 0; i--) cells.push({ y: pickerYear, m: pickerMonth - 1, d: prevLastDay - i, dim: true });
+  for (let d = 1; d <= lastDay; d++) cells.push({ y: pickerYear, m: pickerMonth, d, dim: false });
+  while (cells.length < 42) {
+    const last = cells[cells.length - 1];
+    const ny = last.m === 12 ? last.y + 1 : last.y;
+    const nm = last.m === 12 ? 1 : last.m + 1;
+    cells.push({ y: ny, m: nm, d: 1, dim: true });
+  }
+  document.getElementById('dpContent').innerHTML = `
+    <div class="dp-head">
+      <div class="nav">
+        <button onclick="dpShiftPickerMonth(-1)">‹</button>
+        <div class="ym">${pickerYear} 年 ${pickerMonth} 月</div>
+        <button onclick="dpShiftPickerMonth(1)" ${isNowMonth?'disabled':''}>›</button>
+      </div>
+      <button class="dp-today" onclick="dpJumpToday()">回到今天</button>
+    </div>
+    <div class="dp-cal">
+      <div class="dh">一</div><div class="dh">二</div><div class="dh">三</div><div class="dh">四</div><div class="dh">五</div><div class="dh">六</div><div class="dh">日</div>
+      ${cells.map(c => {
+        const ymd = `${c.y}-${pad(c.m)}-${pad(c.d)}`;
+        const isAct = viewDate === ymd;
+        const isToday = (c.y === todayY && c.m === todayM && c.d === todayD);
+        const cellDate = new Date(c.y, c.m - 1, c.d);
+        const isFuture = cellDate.getTime() > today.getTime() + 86399999;  // 包含当天
+        return `<button class="${isAct?'act':''} ${(isToday && !isAct)?'now':''} ${c.dim?'dim':''}"
+          ${isFuture?'disabled':''}
+          onclick="dpPickDate('${ymd}')">${c.d}</button>`;
+      }).join('')}
+    </div>`;
+}
+function dpShiftPickerYear(delta) {
+  const ny = pickerYear + delta;
+  if (ny < 2020 || ny > 2099) return;
+  pickerYear = ny;
+  if (viewMode === 'day') renderDayPicker(); else renderMonthPicker();
+}
+function dpShiftPickerMonth(delta) {
+  let ny = pickerYear, nm = pickerMonth + delta;
+  if (nm < 1) { nm = 12; ny--; } else if (nm > 12) { nm = 1; ny++; }
+  pickerYear = ny; pickerMonth = nm;
+  renderDayPicker();
+}
+function dpPickMonth(yyyymm) {
+  viewMonth = yyyymm;
+  closeDatePicker();
+  renderAll();
+}
+function dpPickDate(yyyymmdd) {
+  viewDate = yyyymmdd;
+  closeDatePicker();
+  renderAll();
+}
+function dpJumpToday() {
+  viewDate = todayStr();
+  closeDatePicker();
+  renderAll();
+}
+function dpJumpMonth() {
+  viewMonth = nowMonth();
+  closeDatePicker();
+  renderAll();
 }
 
 /* ================= 底部 Tab 切换 ================= */
@@ -945,8 +1189,15 @@ function switchTab(tab) {
 function monthRecords() {
   return records.filter(r => (r.date || '').slice(0, 7) === viewMonth);
 }
+/** 按当前筛选模式（明细页：按月/按日）返回记录；统计页排行仍用 monthRecords */
+function getFilteredRecords() {
+  if (viewMode === 'day') {
+    return records.filter(r => (r.date || '').slice(0, 10) === viewDate);
+  }
+  return monthRecords();
+}
 function calcStats() {
-  const list = monthRecords();
+  const list = getFilteredRecords();
   let inc = 0, exp = 0;
   list.forEach(r => {
     if (r.type === 'income') inc += Number(r.amount) || 0;
@@ -964,7 +1215,7 @@ function renderStats() {
 /* ================= 明细页：环形图（含联动） ================= */
 function renderDonutCard() {
   const box = document.getElementById('donutBox');
-  const list = monthRecords();
+  const list = getFilteredRecords();
   const expList = list.filter(r => r.type === 'expense');
   const incList = list.filter(r => r.type === 'income');
   if (!expList.length && !incList.length) { box.innerHTML = ''; return; }
@@ -974,7 +1225,7 @@ function renderDonutCard() {
   box.innerHTML = `
     <div class="chart-card">
       <div class="ch-title">
-        <h2>本月分类占比</h2>
+        <h2 id="donutTitle">本月分类占比</h2>
         <div class="toggle">
           <button class="${chartTab === 'expense' ? 'active' : ''}" data-tab="expense">支出</button>
           <button class="${chartTab === 'income' ? 'active' : ''}" data-tab="income">收入</button>
@@ -1004,7 +1255,7 @@ function renderDonutCard() {
 }
 
 function renderDonut(type) {
-  const list = monthRecords().filter(r => r.type === type);
+  const list = getFilteredRecords().filter(r => r.type === type);
   const total = list.reduce((s, r) => s + (Number(r.amount) || 0), 0);
   if (!total) return `<div class="donut-empty">本月暂无${type === 'expense' ? '支出' : '收入'}</div>`;
 
@@ -1228,7 +1479,7 @@ function shortMoney(v) {
 }
 /* ================= 列表 ================= */
 function filtered() {
-  let list = monthRecords();
+  let list = getFilteredRecords();
   // 日期范围
   if (dateFrom || dateTo) {
     list = list.filter(r => {
@@ -1259,9 +1510,10 @@ function renderList() {
   const listEl = document.getElementById('list');
 
   // 标题
-  let title = '本月明细';
-  if (filter === 'expense') title = '本月支出';
-  else if (filter === 'income') title = '本月收入';
+  const word = viewMode === 'day' ? '今日' : '本月';
+  let title = word + '明细';
+  if (filter === 'expense') title = word + '支出';
+  else if (filter === 'income') title = word + '收入';
   else if (filter !== 'all') {
     const isInc = list[0] && list[0].type === 'income';
     title = getCat(isInc ? 'income' : 'expense', filter).label + '明细';
@@ -1434,8 +1686,13 @@ function saveEditor() {
     try { localStorage.setItem(MEM_KEY, JSON.stringify({ type: editType, cat: editCat })); } catch (e) {}
   }
   save(); closeEditor();
-  // 新增/编辑后，如果当前查看的不是该账所在月份，自动跳到
-  if ((data.date || '').slice(0, 7) !== viewMonth) viewMonth = (data.date || '').slice(0, 7);
+  // 新增/编辑后：如果当前查看的是月模式，跳到账所在月；日模式则跳到账所在日
+  const dKey = (data.date || '').slice(0, 10);
+  if (viewMode === 'day') {
+    if (dKey !== viewDate) viewDate = dKey;
+  } else {
+    if ((data.date || '').slice(0, 7) !== viewMonth) viewMonth = (data.date || '').slice(0, 7);
+  }
   renderAll();
 }
 function confirmDelete(id) {
@@ -1673,20 +1930,54 @@ document.getElementById('ghUpload').onclick = ghUpload;
 document.getElementById('ghDownload').onclick = ghDownload;
 
 // 月份切换（明细页 + 统计页各一套）
-[['prevMonth1', 'nextMonth1', 'currentMonth1'], ['prevMonth2', 'nextMonth2', 'currentMonth2']].forEach(ids => {
-  document.getElementById(ids[0]).onclick = () => { viewMonth = shiftMonth(viewMonth, -1); renderAll(); };
-  document.getElementById(ids[1]).onclick = () => { viewMonth = shiftMonth(viewMonth, 1); renderAll(); };
-  document.getElementById(ids[2]).onclick = () => { viewMonth = nowMonth(); renderAll(); };
-});
+// 明细页：左右箭头按模式自适应，标题点击弹 picker
+(() => {
+  const prev = document.getElementById('prevMonth1');
+  const next = document.getElementById('nextMonth1');
+  const title = document.getElementById('currentMonth1');
+  prev.onclick = () => {
+    if (viewMode === 'day') viewDate = shiftDay(viewDate, -1);
+    else viewMonth = shiftMonth(viewMonth, -1);
+    renderAll();
+  };
+  next.onclick = () => {
+    if (viewMode === 'day') {
+      if (viewDate < todayStr()) { viewDate = shiftDay(viewDate, 1); renderAll(); }
+    } else {
+      viewMonth = shiftMonth(viewMonth, 1); renderAll();
+    }
+  };
+  title.onclick = () => openDatePicker();
+  document.querySelectorAll('#currentMonth1 .mode-switch button').forEach(b => {
+    b.onclick = () => {
+      if (b.dataset.mode === viewMode) { openDatePicker(); return; }
+      viewMode = b.dataset.mode;
+      if (viewMode === 'day' && !viewDate) viewDate = todayStr();
+      renderAll();
+    };
+  });
+})();
+
+// 统计页：始终按月，标题点击弹 picker
+(() => {
+  const prev = document.getElementById('prevMonth2');
+  const next = document.getElementById('nextMonth2');
+  const title = document.getElementById('currentMonth2');
+  prev.onclick = () => { viewMonth = shiftMonth(viewMonth, -1); renderAll(); };
+  next.onclick = () => { viewMonth = shiftMonth(viewMonth, 1); renderAll(); };
+  title.onclick = () => openMonthPicker();
+})();
 
 // 底部 Tab 切换
 document.querySelectorAll('.tab-btn').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
 
 /* ================= 启动 ================= */
 viewMonth = nowMonth();
+viewDate = todayStr();
 load();
 renderAll();
 switchTab('main');
+document.getElementById('datePickerMask').onclick = closeDatePicker;
 
 /* PWA：Service Worker 注册 */
 if ('serviceWorker' in navigator) {
